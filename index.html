@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive financial education — compounding, account ladders, paycheck math, Roth vs Traditional, Coast FIRE, and what to invest in.">
+<meta name="theme-color" content="#1A1A1A">
+<title>Money Basics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A5E;--green-light:#E6F4EF;--green-mid:#2EA87A;
+  --amber:#C97B1A;--amber-light:#FDF3E3;
+  --red:#C94040;--red-light:#FDEAEA;
+  --blue:#2563A8;--blue-light:#E8F0FB;
+  --purple:#5B4DC4;--purple-light:#EDEBFB;
+  --text:#1A1A1A;--text-2:#555;--text-3:#888;
+  --border:#E8E4DD;--bg:#FAF9F6;--card:#FFFFFF;--surface:#F3F1EC;
+  --radius:12px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+
+/* HEADER */
+.app-header{background:var(--text);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;}
+.app-logo{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;letter-spacing:-.3px;}
+.app-logo span{color:var(--green-mid);}
+.inflation-badge{font-size:11px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:20px;}
+
+/* NAV */
+.nav-bar{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;padding:0 12px;gap:2px;}
+.nav-bar::-webkit-scrollbar{display:none;}
+.nav-btn{flex-shrink:0;padding:13px 14px 11px;font-size:13px;font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-weight:500;color:var(--text-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;}
+.nav-btn:hover{color:var(--text-2);}
+.nav-btn.active{color:var(--text);border-bottom-color:var(--green);}
+
+/* CONTENT */
+.content{max-width:680px;margin:0 auto;padding:28px 20px 60px;}
+.module{display:none;}
+.module.active{display:block;}
+
+/* TYPOGRAPHY */
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:6px;}
+.mod-title{font-family:'DM Serif Display',serif;font-size:26px;line-height:1.2;margin-bottom:8px;}
+.mod-desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px;}
+.section-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:6px;margin-top:32px;}
+.section-sub{font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:16px;}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px;margin-top:24px;}
+
+/* INSIGHT BOXES */
+.insight{border-left:3px solid var(--green);border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--green-light);padding:12px 16px;font-size:13px;color:#0D4D38;line-height:1.7;margin-bottom:16px;}
+.insight-amber{border-left-color:var(--amber);background:var(--amber-light);color:#5C3700;}
+.insight-blue{border-left-color:var(--blue);background:var(--blue-light);color:#0D2D5C;}
+.insight-red{border-left-color:var(--red);background:var(--red-light);color:#5C0D0D;}
+.insight-purple{border-left-color:var(--purple);background:var(--purple-light);color:#2A2260;}
+
+/* CONTROLS */
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.slider-label{font-size:13px;color:var(--text-2);min-width:140px;flex-shrink:0;}
+.slider-val{font-size:13px;font-weight:600;min-width:68px;text-align:right;color:var(--text);}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--green);cursor:pointer;}
+select{font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--text);cursor:pointer;}
+.toggle-row{display:flex;gap:12px;margin-bottom:18px;align-items:center;flex-wrap:wrap;}
+.toggle-row label{font-size:13px;color:var(--text-2);}
+
+/* METRIC CARDS */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.metric-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.metric-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;}
+.metric-label{font-size:11px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
+.metric-value{font-family:'DM Serif Display',serif;font-size:22px;}
+.metric-sub{font-size:11px;color:var(--text-3);margin-top:3px;}
+
+/* CHART */
+.chart-wrap{position:relative;width:100%;height:220px;margin-bottom:12px;}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* BAR */
+.bar-track{height:32px;background:var(--surface);border-radius:var(--radius-sm);overflow:hidden;display:flex;margin-bottom:6px;}
+.bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;transition:width .3s;overflow:hidden;white-space:nowrap;padding:0 4px;}
+
+/* TIMELINE */
+.tl-bar{height:36px;background:var(--surface);border-radius:var(--radius-sm);overflow:hidden;display:flex;margin-bottom:6px;}
+.tl-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;overflow:hidden;white-space:nowrap;padding:0 6px;}
+.tl-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);}
+
+/* BANNERS */
+.banner{border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.6;}
+.banner-green{background:var(--green-light);border:1px solid #A8D9C8;color:#0A4033;}
+.banner-amber{background:var(--amber-light);border:1px solid #F0C97A;color:#5C3700;}
+
+/* LADDER */
+.step-card{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;background:var(--card);cursor:pointer;transition:border-color .15s;}
+.step-card.open{border-color:var(--green);}
+.step-header{display:flex;align-items:center;gap:12px;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.step-title{font-size:14px;font-weight:600;color:var(--text);}
+.step-sub{font-size:12px;color:var(--text-3);margin-top:2px;}
+.step-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-2);line-height:1.75;}
+.step-detail.open{display:block;}
+.why{background:var(--blue-light);border-left:3px solid var(--blue);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 12px;margin-top:10px;font-size:12px;color:var(--blue);line-height:1.6;}
+.connector{width:2px;height:8px;background:var(--border);margin:0 auto;}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-right:4px;margin-bottom:6px;font-weight:500;}
+
+/* FLOWCHART */
+.progress-bar{height:3px;background:var(--surface);border-radius:2px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.q-card{border:1px solid var(--border);border-radius:var(--radius);padding:20px;background:var(--card);margin-bottom:12px;}
+.q-text{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;line-height:1.3;}
+.q-sub{font-size:13px;color:var(--text-2);margin-bottom:16px;line-height:1.7;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.opt-btn{border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 16px;font-size:13px;font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--card);color:var(--text);cursor:pointer;transition:all .15s;}
+.opt-btn:hover{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.crumb-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.crumb{font-size:11px;color:var(--text-3);background:var(--surface);border-radius:20px;padding:3px 10px;}
+.result-card{border-radius:var(--radius);padding:20px;margin-bottom:12px;}
+.result-title{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px;}
+.result-body{font-size:13px;line-height:1.8;}
+.result-roth{background:var(--green-light);border:1.5px solid var(--green);}
+.result-trad{background:var(--blue-light);border:1.5px solid var(--blue);}
+.result-both{background:var(--purple-light);border:1.5px solid var(--purple);}
+.result-split{background:var(--amber-light);border:1.5px solid var(--amber);}
+.reset-btn{border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:transparent;color:var(--text-2);cursor:pointer;margin-top:4px;}
+.reset-btn:hover{background:var(--surface);}
+
+/* TABS */
+.tab-nav{display:flex;gap:2px;background:var(--surface);border-radius:var(--radius-sm);padding:3px;margin-bottom:20px;}
+.tab-btn{flex:1;padding:8px 10px;font-size:13px;font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-weight:500;border:none;border-radius:6px;background:transparent;color:var(--text-3);cursor:pointer;transition:all .15s;}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* FUND TABLE */
+.fund-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+.fund-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);border-bottom:2px solid var(--border);}
+.fund-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.fund-table tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;}
+.badge-green{background:var(--green-light);color:var(--green);}
+.badge-red{background:var(--red-light);color:var(--red);}
+.badge-gray{background:var(--surface);color:var(--text-3);}
+.badge-blue{background:var(--blue-light);color:var(--blue);}
+
+/* ALLOC */
+.alloc-bar{height:40px;border-radius:var(--radius-sm);overflow:hidden;display:flex;margin-bottom:6px;}
+.alloc-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;transition:width .3s;overflow:hidden;white-space:nowrap;padding:0 6px;}
+
+/* TARGET DATE */
+.td-card{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;background:var(--card);}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:16px;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:4px;}
+.stat-label{font-size:12px;color:var(--text-2);line-height:1.5;}
+.stat-source{font-size:10px;color:var(--text-3);margin-top:6px;}
+.cite{display:inline-block;font-size:10px;color:var(--blue);border:1px solid var(--blue-light);border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle;text-decoration:none;}
+
+/* DALBAR */
+.dalbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.dalbar-label{font-size:13px;color:var(--text-2);min-width:150px;}
+.dalbar-bar{flex:1;height:28px;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600;color:#fff;}
+
+/* BUFFETT */
+.buffett-bar{height:48px;border-radius:var(--radius-sm);overflow:hidden;display:flex;margin-bottom:8px;}
+.buffett-seg{height:100%;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:600;}
+
+/* SURVIVORSHIP */
+.surv-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:12px;}
+.surv-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;transition:all .3s;}
+.surv-cell.winner{background:#1A7A5E;color:#fff;}
+.surv-cell.loser{background:#F3F1EC;color:var(--text-3);border:1px solid var(--border);}
+.surv-cell.dead{background:#FDEAEA;color:#C94040;border:1px solid #F5C0C0;}
+
+/* RULE BOX */
+.rule-box{border-radius:var(--radius);border:1.5px solid var(--purple);background:var(--purple-light);padding:16px 20px;margin-bottom:20px;}
+.rule-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--purple);margin-bottom:10px;}
+.rule-item{display:flex;gap:10px;margin-bottom:10px;font-size:13px;color:var(--text-2);line-height:1.6;}
+
+/* ACCOUNT STACK */
+.account-row{border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border:1px solid var(--border);}
+.account-row.locked{background:#F7FBF9;border-color:var(--green);}
+.account-row.flex{background:#FFFBF5;border-color:var(--amber);}
+.account-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.account-row-title{font-size:14px;font-weight:600;}
+.account-row-badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+.badge-locked{background:var(--green-light);color:var(--green);}
+.badge-flex2{background:var(--amber-light);color:var(--amber);}
+.account-row-sub{font-size:12px;color:var(--text-2);line-height:1.6;}
+.alloc-mini{height:12px;border-radius:4px;overflow:hidden;display:flex;margin-top:8px;}
+
+/* 90/10 */
+.ninetyten-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.bucket{border-radius:var(--radius);padding:16px;border:1px solid var(--border);}
+.bucket-boring{border-color:var(--green);background:var(--green-light);}
+.bucket-fun{border-color:var(--amber);background:var(--amber-light);}
+.bucket-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+.bucket-val{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px;}
+.bucket-sub{font-size:11px;color:var(--text-3);}
+.mo-bar{height:40px;border-radius:var(--radius-sm);overflow:hidden;display:flex;margin-bottom:6px;}
+.mo-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;padding:0 10px;overflow:hidden;white-space:nowrap;}
+
+/* REF */
+.ref-box{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.ref-item{font-size:12px;color:var(--text-2);line-height:1.7;padding:8px 0;border-bottom:1px solid var(--border);}
+.ref-item:last-child{border-bottom:none;}
+.ref-num{font-weight:600;color:var(--blue);margin-right:6px;}
+
+hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
+@media(max-width:500px){
+  .slider-label{min-width:90px;font-size:12px;}
+  .slider-val{min-width:44px;font-size:12px;}
+  .surv-grid{grid-template-columns:repeat(6,1fr);}
+  .mod-title{font-size:22px;}
+  .metric-grid,.metric-grid-3,.stat-grid,.ninetyten-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-logo">Money<span>.</span>Basics</div>
+  <div class="inflation-badge">Today's dollars · 4% real return</div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn active" onclick="showMod('compound',this)">⏱ Compounding</button>
+  <button class="nav-btn" onclick="showMod('accounts',this)">🪜 Account Ladder</button>
+  <button class="nav-btn" onclick="showMod('paycheck',this)">💵 Paycheck</button>
+  <button class="nav-btn" onclick="showMod('roth',this)">🔀 Roth vs Trad</button>
+  <button class="nav-btn" onclick="showMod('coast',this)">🏄 Coast FIRE</button>
+  <button class="nav-btn" onclick="showMod('invest',this)">📊 What to Buy</button>
+  <button class="nav-btn" onclick="showMod('jobchange',this)">🔄 Job Change</button>
+</div>
+
+<div class="content">
+
+<!-- ══ MODULE 1: COMPOUND ══ -->
+<div class="module active" id="mod-compound">
+  <div class="eyebrow">Module 1</div>
+  <div class="mod-title">Time is the asset</div>
+  <div class="mod-desc">The most powerful force in investing isn't how much you earn — it's how early you start. See what waiting 10 years actually costs.</div>
+  <div class="slider-row"><span class="slider-label">Monthly contribution</span><input type="range" min="100" max="2000" step="50" value="300" id="c-mo" oninput="updateC()"><span class="slider-val" id="c-mo-v">$300</span></div>
+  <div class="slider-row"><span class="slider-label">Real annual return</span><input type="range" min="2" max="8" step=".5" value="4" id="c-rate" oninput="updateC()"><span class="slider-val" id="c-rate-v">4%</span></div>
+  <div class="slider-row"><span class="slider-label">Retire at age</span><input type="range" min="55" max="70" step="1" value="65" id="c-ret" oninput="updateC()"><span class="slider-val" id="c-ret-v">65</span></div>
+  <div class="slider-row"><span class="slider-label">Your current age</span><input type="range" min="20" max="35" step="1" value="23" id="c-age" oninput="updateC()"><span class="slider-val" id="c-age-v">23</span></div>
+  <div class="metric-grid" id="c-metrics"></div>
+  <div class="insight" id="c-insight"></div>
+  <div class="legend"><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Start now</div><div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Start 10 yrs later</div></div>
+  <div class="chart-wrap"><canvas id="c-chart"></canvas></div>
+  <div class="insight insight-blue"><strong>About these numbers:</strong> Returns shown are <em>real</em> (inflation-adjusted). 4% real ≈ 7% nominal minus 3% inflation. All dollar amounts are in today's purchasing power.</div>
+  <div class="insight insight-purple" style="margin-top:12px"><strong>The move from this tab:</strong> Open a Roth IRA at Fidelity (fidelity.com) or Vanguard (vanguard.com). Takes 10 minutes. Buy <strong>FZROX + FZILX</strong> (Fidelity, 0% fee) or <strong>VTI + VXUS</strong> (Vanguard/Schwab, 0.03–0.05%/yr) — ~80% US, ~20% international. You can contribute for the current tax year <em>up until April 15 of the following year</em> — meaning you can fund your 2026 Roth as late as April 15, 2027. Start with whatever you have.</div>
+</div>
+
+<!-- ══ MODULE 2: ACCOUNT LADDER ══ -->
+<div class="module" id="mod-accounts">
+  <div class="eyebrow">Module 2</div>
+  <div class="mod-title">Where to put your money first</div>
+  <div class="mod-desc">The order you fund accounts matters more than how much you invest. Tap each step to learn why.</div>
+  <div class="toggle-row">
+    <label>High-interest debt?</label>
+    <select id="a-debt" onchange="renderLadder()"><option value="no">No</option><option value="yes">Yes (>7% APR)</option></select>
+    <label>Student loans?</label>
+    <select id="a-loans" onchange="renderLadder()"><option value="no">No</option><option value="pslf">Yes — PSLF eligible</option><option value="high">Yes — high rate (>7%)</option><option value="low">Yes — low rate (<7%)</option></select>
+  </div>
+  <div class="toggle-row">
+    <label>Retirement plan type</label>
+    <select id="a-plan" onchange="syncPlan('a')">
+      <option value="401k">401k</option>
+      <option value="simple">SIMPLE IRA</option>
+    </select>
+    <label>Employer match?</label>
+    <select id="a-match" onchange="syncMatch('a')"><option value="yes">Yes</option><option value="no">No</option></select>
+    <div id="a-simple-size" style="display:none;align-items:center;gap:8px;">
+      <label>Employer size</label>
+      <select id="a-simple-emp" onchange="syncEmpSize('a')">
+        <option value="18000">≤25 employees ($18,000/yr)</option>
+        <option value="17000">&gt;25 employees ($17,000/yr)</option>
+      </select>
+    </div>
+    <label>HSA-eligible plan?</label>
+    <select id="a-hsa" onchange="renderLadder()"><option value="yes">Yes</option><option value="no">No</option></select>
+  </div>
+  <div class="slider-row"><span class="slider-label">Annual salary</span><input type="range" min="40000" max="200000" step="1000" value="65000" id="a-sal" oninput="syncSal('a')"><span class="slider-val" id="a-sal-v">$65,000</span></div>
+  <div id="a-ladder"></div>
+</div>
+
+<!-- ══ MODULE 3: PAYCHECK ══ -->
+<div class="module" id="mod-paycheck">
+  <div class="eyebrow">Module 3</div>
+  <div class="mod-title">Pay yourself first</div>
+  <div class="mod-desc">Savings happen before you see the money — not from what's left over. See how contributions affect take-home and how the tax code subsidizes your retirement accounts.</div>
+  <div class="toggle-row">
+    <label>Filing status</label>
+    <select id="p-filing" onchange="updateP()"><option value="single">Single</option><option value="married">Married</option></select>
+    <label>State taxes</label>
+    <select id="p-state" onchange="updateP()">
+      <option value="nj">NY / NJ (progressive)</option>
+      <option value="ca">California (progressive)</option>
+      <option value="mid">Mid-range (~5% flat)</option>
+      <option value="none">No state tax</option>
+    </select>
+    <label>Pay frequency</label>
+    <select id="p-freq" onchange="updatePlan()">
+      <option value="26">Biweekly (26×/yr)</option>
+      <option value="24">Semi-monthly (24×/yr)</option>
+      <option value="52">Weekly (52×/yr)</option>
+      <option value="12">Monthly (12×/yr)</option>
+    </select>
+  </div>
+  <div class="toggle-row">
+    <label>Retirement plan</label>
+    <select id="p-plan" onchange="syncPlan('p')">
+      <option value="401k">401k — max $24,500/yr</option>
+      <option value="simple">SIMPLE IRA</option>
+    </select>
+    <div id="p-simple-size" style="display:none;align-items:center;gap:8px;">
+      <label>Employer size</label>
+      <select id="p-simple-emp" onchange="syncEmpSize('p')">
+        <option value="18000">≤25 employees ($18,000/yr)</option>
+        <option value="17000">&gt;25 employees ($17,000/yr)</option>
+      </select>
+    </div>
+  </div>
+  <div class="slider-row"><span class="slider-label">Annual salary</span><input type="range" min="40000" max="200000" step="1000" value="65000" id="p-sal" oninput="syncSal('p')"><span class="slider-val" id="p-sal-v">$65,000</span></div>
+  <div class="slider-row"><span class="slider-label" id="p-contrib-lbl">401k <span style="font-size:10px;color:var(--text-3)" id="p-contrib-max-lbl">(max $24,500/yr)</span></span><input type="range" min="0" max="942" step="25" value="200" id="p-contrib" oninput="updateP()"><span class="slider-val" id="p-contrib-v">$200/pp</span></div>
+  <div id="p-match-callout" style="margin:-4px 0 10px 0;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5"></div>
+  <div class="slider-row"><span class="slider-label">Employer match <span style="font-size:10px;color:var(--text-3)">(% of salary)</span></span><input type="range" min="0" max="8" step="0.5" value="3" id="p-match" oninput="syncMatch('p')"><span class="slider-val" id="p-match-v">3%</span></div>
+  <div class="slider-row"><span class="slider-label">Roth IRA <span style="font-size:10px;color:var(--text-3)">(max $7,000/yr)</span></span><input type="range" min="0" max="269" step="25" value="269" id="p-roth" oninput="updateP()"><span class="slider-val" id="p-roth-v">$269/pp</span></div>
+  <div class="metric-grid" id="p-metrics"></div>
+  <div class="insight" id="p-insight"></div>
+  <div class="section-label" style="margin-top:0" id="p-bar-label">Per paycheck breakdown (biweekly)</div>
+  <div class="bar-track" id="p-bar"></div>
+  <div class="legend" style="margin-top:8px;margin-bottom:16px;">
+    <div class="legend-item"><div class="legend-dot" style="background:#C94040"></div>Fed tax</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E8917A"></div>FICA</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F0C97A"></div>State</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9B91E8"></div><span id="p-plan-legend">401k</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#BEB8F5"></div>Roth IRA</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Take-home</div>
+  </div>
+  <table id="p-table" style="width:100%;font-size:13px;border-collapse:collapse;"></table>
+  <div style="display:flex;align-items:center;gap:12px;margin-top:24px;margin-bottom:0">
+    <div class="section-label" style="margin:0;flex:1">Livability check</div>
+    <select id="p-loc" onchange="updateP()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+      <option value="manhattan">Manhattan</option>
+      <option value="nj_boros">NYC outer boroughs (Brooklyn/Queens)</option>
+      <option value="nj_across">NJ across from NYC (Jersey City/Hoboken)</option>
+      <option value="mid">Mid-cost city</option>
+      <option value="low">Lower-cost area</option>
+    </select>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;">
+    <select id="p-live" onchange="updateP()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+      <option value="solo">Living alone</option>
+      <option value="share">Sharing with roommate</option>
+      <option value="home">Living at home</option>
+    </select>
+    <span style="font-size:12px;color:var(--text-3)">Family support:</span>
+    <input type="range" min="0" max="4000" step="50" value="0" id="p-support" oninput="updateP()" style="width:100px;accent-color:var(--green)">
+    <span style="font-size:12px;font-weight:600;color:var(--green);min-width:52px" id="p-support-v">$0/mo</span>
+  </div>
+  <div id="p-budget"></div>
+</div>
+
+<!-- ══ MODULE 4: ROTH ══ -->
+<div class="module" id="mod-roth">
+  <div class="eyebrow">Module 4</div>
+  <div class="mod-title">Roth or Traditional?</div>
+  <div class="mod-desc">Answer a few questions about your situation and we'll tell you which account type makes more sense — and why.</div>
+  <div class="progress-bar"><div class="progress-fill" id="r-prog" style="width:0%"></div></div>
+  <div id="r-app"></div>
+</div>
+
+<!-- ══ MODULE 5: COAST FIRE ══ -->
+<div class="module" id="mod-coast">
+  <div class="eyebrow">Module 5</div>
+  <div class="mod-title">Coast FIRE</div>
+  <div class="mod-desc">The point where your savings will grow to fund retirement on their own — no more contributions needed. Find your number.</div>
+  <div class="insight insight-purple">Instead of fixating on a huge number 40 years away, Coast FIRE gives you a near-term milestone. Hit it, and your savings will grow to cover retirement on their own — contributions become optional. Use the <strong>Paycheck tab</strong> to find your monthly savings, then enter it below.</div>
+  <div class="slider-row"><span class="slider-label">Current age</span><input type="range" min="20" max="45" step="1" value="23" id="cf-age" oninput="updateCF()"><span class="slider-val" id="cf-age-v">23</span></div>
+  <div class="slider-row"><span class="slider-label">Target retirement age</span><input type="range" min="50" max="70" step="1" value="60" id="cf-ret" oninput="updateCF()"><span class="slider-val" id="cf-ret-v">60</span></div>
+  <div class="slider-row"><span class="slider-label">Current savings</span><input type="range" min="0" max="200000" step="1000" value="5000" id="cf-saved" oninput="updateCF()"><span class="slider-val" id="cf-saved-v">$5,000</span></div>
+  <div class="slider-row"><span class="slider-label">Monthly contribution</span><input type="range" min="0" max="3000" step="50" value="300" id="cf-mo" oninput="updateCF()"><span class="slider-val" id="cf-mo-v">$300</span></div>
+  <div class="slider-row"><span class="slider-label">Desired retirement spending</span><input type="range" min="30000" max="150000" step="2500" value="60000" id="cf-inc" oninput="updateCF()"><span class="slider-val" id="cf-inc-v">$60,000</span></div>
+  <div class="slider-row"><span class="slider-label">Real annual return</span><input type="range" min="2" max="8" step=".5" value="4" id="cf-rate" oninput="updateCF()"><span class="slider-val" id="cf-rate-v">4%</span></div>
+  <div id="cf-status"></div>
+  <div class="metric-grid" id="cf-metrics"></div>
+  <div class="insight" id="cf-insight"></div>
+  <div class="section-label" style="margin-top:0">Your timeline</div>
+  <div class="tl-bar" id="cf-tl"></div>
+  <div class="tl-labels" id="cf-tl-labels" style="margin-top:5px;"></div>
+  <div class="insight insight-blue" style="margin-top:20px;"><strong>Note:</strong> All values in today's dollars. 4% real return ≈ 7% nominal − 3% inflation. FIRE number = 25× annual spending (4% rule).</div>
+</div>
+
+<!-- ══ MODULE 6: WHAT TO BUY ══ -->
+<div class="module" id="mod-invest">
+  <div class="eyebrow">Module 6</div>
+  <div class="mod-title">What to actually invest in</div>
+  <div class="mod-desc">The evidence on index funds vs. stock picking — and a smarter framework for doing both.</div>
+  <div class="insight insight-purple" style="margin-bottom:20px"><strong>The short answer:</strong> In your Roth IRA and 401k — buy <strong>FZROX + FZILX</strong> (Fidelity, 0% fee each) or <strong>VTI + VXUS</strong> (Vanguard/Fidelity/Schwab, 0.03–0.05%/yr). ~80% US, ~20% international. Low cost, automatic diversification, zero thinking required. Everything below explains why this works.</div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showInvestTab('index',this)">📊 Index Funds vs Stocks</button>
+    <button class="tab-btn" onclick="showInvestTab('alloc',this)">⚖️ Asset Allocation</button>
+  </div>
+
+  <!-- INDEX TAB -->
+  <div class="tab-panel active" id="itab-index">
+    <div class="section-title" style="margin-top:0">The evidence</div>
+    <div class="section-sub">Audited return data from every active fund vs. simple index funds, published by organizations with no incentive to favor either side.</div>
+
+    <div class="section-label">SPIVA Scorecard — S&P Dow Jones Indices <a class="cite" href="https://www.spglobal.com/spdji/en/research-insights/spiva/" target="_blank">↗</a></div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" style="color:var(--red)">88%</div><div class="stat-label">of large-cap active funds <strong>underperformed</strong> the S&P 500 over 15 years</div><div class="stat-source">SPIVA U.S. Scorecard</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--red)">95%</div><div class="stat-label">of active funds underperform over <strong>20 years</strong> — gets worse the longer you look</div><div class="stat-source">SPIVA U.S. Scorecard · 20-year data</div></div>
+    </div>
+    <div class="insight insight-blue">SPIVA tracks actual reported returns of every active mutual fund against its benchmark. Funds that close due to poor performance are included — not cherry-picked. <a href="https://www.spglobal.com/spdji/en/research-insights/spiva/" target="_blank" style="color:var(--blue)">spglobal.com/spdji</a></div>
+
+    <div class="section-label">DALBAR — What individual investors actually earn <a class="cite" href="https://www.dalbar.com" target="_blank">↗</a></div>
+    <div style="margin-bottom:16px;">
+      <div class="dalbar-row"><span class="dalbar-label">S&P 500 index (30 yr)</span><div class="dalbar-bar" style="width:75%;background:var(--green)">10.7% / year</div></div>
+      <div class="dalbar-row"><span class="dalbar-label">Average stock investor</span><div class="dalbar-bar" style="width:55%;background:var(--red)">8.1% / year</div></div>
+    </div>
+    <div class="insight insight-red">DALBAR measures what real people <em>actually earned</em> after buying high, panic-selling, and chasing hot stocks. The 2.6% annual gap compounds into a massive retirement shortfall — on $100K starting investment, that gap is over $500K at retirement. <a href="https://www.dalbar.com" target="_blank" style="color:var(--blue)">dalbar.com</a></div>
+
+    <div class="section-label">Warren Buffett's $1 million bet <a class="cite" href="https://buffett.cnbc.com/video/2018/02/26/buffetts-million-dollar-bet-paid-off.html" target="_blank">↗</a></div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;">10-year annualized return (2008–2017)</div>
+    <div class="buffett-bar">
+      <div class="buffett-seg" style="width:78%;background:var(--green);color:#fff">S&P 500 index fund: 7.1%/yr</div>
+      <div class="buffett-seg" style="width:22%;background:var(--red);color:#fff">Hedge funds: 2.2%/yr</div>
+    </div>
+    <div class="insight" style="margin-top:10px;">In 2007, Buffett publicly bet $1M that a simple Vanguard S&P 500 index fund would beat the world's best hedge funds over 10 years. He won by a landslide. His opponent conceded early. Buffett has since instructed his wife's inheritance go into a simple S&P 500 index fund — not his own team's management.</div>
+
+    <hr>
+
+    <div class="section-title">Why it still feels wrong</div>
+    <div class="section-sub">You know someone who made a killing on Nvidia. So why doesn't the data match? Survivorship bias — you only hear about the winners.</div>
+
+    <div class="section-label">100 stocks from 10 years ago — what actually happened</div>
+    <div id="surv-grid" class="surv-grid"></div>
+    <div class="legend" style="margin-bottom:12px;">
+      <div class="legend-item"><div style="width:12px;height:12px;border-radius:3px;background:#1A7A5E;flex-shrink:0"></div>Big winners (ones people talk about)</div>
+      <div class="legend-item"><div style="width:12px;height:12px;border-radius:3px;background:#F3F1EC;border:1px solid var(--border);flex-shrink:0"></div>Underperformed or flat</div>
+      <div class="legend-item"><div style="width:12px;height:12px;border-radius:3px;background:#FDEAEA;border:1px solid #F5C0C0;flex-shrink:0"></div>Major losers / near zero</div>
+    </div>
+    <div id="surv-reveal" style="display:none;" class="insight insight-amber"></div>
+    <button id="surv-btn" onclick="revealSurv()" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--card);color:var(--text);cursor:pointer;margin-bottom:16px;">Show me the Nvidia, Apple, and Tesla</button>
+
+    <div class="insight insight-amber"><strong>The stocks you hear about are the survivors.</strong> Nobody posts about Peloton (−95%), Zoom (−85%), Rivian (−90%), or WeWork (bankrupt). The index fund owned Nvidia all the way up automatically — without guessing in advance, and without needing to hold through its 80% drawdown in 2022 without panic-selling.</div>
+    <div class="insight insight-blue"><strong>The timing problem:</strong> Even picking the right stock isn't enough. Studies show most individual investors who owned Nvidia still underperformed the index — they sold too early or bought after the big run.</div>
+
+    <hr>
+
+    <div class="section-title">The 90/10 framework</div>
+    <div class="section-sub">We're not telling you to stop picking stocks. Instead, here's a structure that lets you play without putting the foundation at risk. It's about how you allocate each dollar, not which accounts you open.</div>
+
+    <div class="rule-box">
+      <div class="rule-title">The 90/10 rule — applied to every dollar you invest</div>
+      <div class="rule-item"><span style="font-size:16px;flex-shrink:0">🔒</span><div><strong>Retirement accounts (Roth IRA, 401k) — 100% index funds, always.</strong> These are the vault. No stock picks, ever. FZROX + FZILX, or VTI + VXUS. Automated and untouched.</div></div>
+      <div class="rule-item"><span style="font-size:16px;flex-shrink:0">🟢</span><div><strong>Taxable brokerage, 90 cents of every dollar — index funds.</strong> Same boring foundation continues here. This is the long-term engine inside your brokerage account.</div></div>
+      <div class="rule-item"><span style="font-size:16px;flex-shrink:0">🟡</span><div><strong>Taxable brokerage, 10 cents of every dollar — your picks.</strong> This slice lives inside the same brokerage account. Pick stocks, try a sector ETF, whatever excites you. Real money, real consequences — that's how you learn.</div></div>
+      <div class="rule-item"><span style="font-size:16px;flex-shrink:0">💡</span><div><strong>Key insight:</strong> The 10% slice could theoretically go to zero and it wouldn't sink you — because 90% of your taxable deposits plus 100% of your retirement accounts are still compounding. The <em>account</em> doesn't go to zero. A small slice of monthly contributions gets to be fun.</div></div>
+    </div>
+
+    <div class="section-label">How your money flows each month</div>
+    <div class="account-row locked" style="margin-bottom:8px;">
+      <div class="account-row-header"><div class="account-row-title">🔒 Roth IRA + 401k</div><span class="account-row-badge badge-locked">100% index funds</span></div>
+      <div class="account-row-sub">Every dollar here goes into boring index funds. No exceptions. FZROX + FZILX (Fidelity) or VTI + VXUS (Vanguard/Schwab). Automated and untouched.</div>
+      <div class="alloc-mini"><div style="width:100%;background:var(--green);height:100%"></div></div>
+    </div>
+    <div class="account-row flex" style="margin-bottom:20px;">
+      <div class="account-row-header"><div class="account-row-title">📈 Taxable brokerage</div><span class="account-row-badge badge-flex2">90% index · 10% picks</span></div>
+      <div class="account-row-sub">The same brokerage account holds both. 90 cents of every dollar deposited goes into index funds. 10 cents goes into whatever you want to pick. The account doesn't go to zero — a small slice of your monthly deposit might.</div>
+      <div class="alloc-mini"><div style="width:90%;background:var(--green);height:100%"></div><div style="width:10%;background:var(--amber);height:100%"></div></div>
+    </div>
+
+    <div class="section-label">See the monthly dollar split and long-term results</div>
+    <div class="slider-row"><span class="slider-label">Monthly into taxable brokerage</span><input type="range" min="100" max="2000" step="50" value="500" id="nt-mo" oninput="updateNT()"><span class="slider-val" id="nt-mo-v">$500</span></div>
+    <div class="mo-bar" id="mo-bar" style="margin-bottom:6px;"></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:20px;"><span>← Index funds (90%)</span><span>Picks (10%) →</span></div>
+
+    <div class="slider-row"><span class="slider-label">Years invested</span><input type="range" min="5" max="40" step="1" value="30" id="nt-yrs" oninput="updateNT()"><span class="slider-val" id="nt-yrs-v">30 years</span></div>
+    <div class="slider-row"><span class="slider-label">Your picks return</span><input type="range" min="-5" max="20" step="1" value="5" id="nt-fun" oninput="updateNT()"><span class="slider-val" id="nt-fun-v">+5%</span></div>
+
+    <div class="ninetyten-grid" id="nt-cards"></div>
+    <div class="insight" id="nt-insight"></div>
+
+    <div class="chart-wrap"><canvas id="nt-chart"></canvas></div>
+    <div class="legend" style="margin-bottom:20px;">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>90/10 total</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>All stock picking (your rate)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>All index funds</div>
+    </div>
+
+    <div class="insight insight-purple"><strong>The real value of 90/10:</strong> After a few years you'll have two positions running side by side with real money. The comparison becomes its own teacher. Most people who try it eventually move the split to 95/5 or 100/0 on their own. The lesson lands when it's personal.</div>
+
+    <div class="section-label">References</div>
+    <div class="ref-box">
+      <div class="ref-item"><span class="ref-num">[1]</span>SPIVA U.S. Scorecard — S&P Dow Jones Indices. <a style="color:var(--blue);font-size:11px;" href="https://www.spglobal.com/spdji/en/research-insights/spiva/" target="_blank">spglobal.com/spdji/en/research-insights/spiva/</a></div>
+      <div class="ref-item"><span class="ref-num">[2]</span>DALBAR Quantitative Analysis of Investor Behavior (QAIB). <a style="color:var(--blue);font-size:11px;" href="https://www.dalbar.com" target="_blank">dalbar.com</a></div>
+      <div class="ref-item"><span class="ref-num">[3]</span>Buffett's $1M bet — Berkshire 2017 Annual Letter. <a style="color:var(--blue);font-size:11px;" href="https://buffett.cnbc.com/video/2018/02/26/buffetts-million-dollar-bet-paid-off.html" target="_blank">buffett.cnbc.com</a></div>
+    </div>
+  </div>
+
+  <!-- ALLOC TAB -->
+  <div class="tab-panel" id="itab-alloc">
+    <div class="insight insight-purple"><strong>Asset allocation</strong> — how you divide between stocks and bonds — is the single biggest driver of long-term results. More important than which specific funds you pick.</div>
+    <div class="section-label" style="margin-top:0">Find your allocation</div>
+    <div class="slider-row"><span class="slider-label">Your age</span><input type="range" min="20" max="65" step="1" value="23" id="al-age" oninput="updateAl()"><span class="slider-val" id="al-age-v">23</span></div>
+    <div class="slider-row"><span class="slider-label">Risk comfort</span><input type="range" min="1" max="3" step="1" value="2" id="al-risk" oninput="updateAl()"><span class="slider-val" id="al-risk-v">Moderate</span></div>
+    <div class="section-label">Your suggested allocation</div>
+    <div class="alloc-bar" id="al-bar"></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:20px;" id="al-labels"></div>
+    <div class="metric-grid" id="al-metrics"></div>
+    <div class="insight" id="al-insight"></div>
+    <div class="section-label">What to actually buy</div>
+    <div id="al-funds"></div>
+    <hr>
+    <div class="section-label" style="margin-top:0">Why not a target date fund?</div>
+    <div class="insight insight-amber">Target date funds auto-shift from stocks to bonds as you approach retirement. That auto-pilot is useful at 55 — <strong>it costs you at 25.</strong> A 2065 fund today already holds ~10–15% in bonds, and keeps adding more every year. With a 40-year runway you can ride out any crash — time is your safety net. Bonds in your 20s just drag returns without giving you anything useful in return.</div>
+    <div class="insight insight-green" style="margin-top:10px;"><strong>Simplest portfolio in your 20s:</strong> Two funds — <strong>FZROX + FZILX</strong> (Fidelity, 0% fee each) or <strong>VTI + VXUS</strong> (Vanguard/Fidelity/Schwab, 0.03–0.05%/yr). ~80% US, ~20% international. Rebalance once a year. Add bonds when you're within 15–20 years of retirement.</div>
+  </div>
+</div>
+
+<!-- ══ MODULE 7: JOB CHANGE ══ -->
+<div class="module" id="mod-jobchange">
+  <div class="eyebrow">Module 7</div>
+  <div class="mod-title">Job change fire drill</div>
+  <div class="mod-desc">Changing jobs triggers five financial decisions with hard deadlines. Most people only negotiate salary — and forfeit thousands everywhere else.</div>
+
+  <div class="insight insight-red"><strong>The #1 mistake:</strong> Cashing out your old 401k. On a $20,000 balance you lose ~$6,000–7,000 to taxes and the 10% penalty — instantly, permanently. Roll it over instead.</div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showJCTab('rollover',this)">🏦 401k Rollover</button>
+    <button class="tab-btn" onclick="showJCTab('vesting',this)">📅 Vesting</button>
+    <button class="tab-btn" onclick="showJCTab('coverage',this)">💊 Coverage Gap</button>
+    <button class="tab-btn" onclick="showJCTab('checklist',this)">✅ 30-Day List</button>
+  </div>
+
+  <!-- 401k ROLLOVER TAB -->
+  <div class="tab-panel active" id="jctab-rollover">
+    <div class="section-sub" style="margin-top:0">Answer a few questions and we'll tell you exactly what to do with your old 401k.</div>
+    <div class="progress-bar"><div class="progress-fill" id="jc-prog" style="width:0%"></div></div>
+    <div id="jc-app"></div>
+  </div>
+
+  <!-- VESTING TAB -->
+  <div class="tab-panel" id="jctab-vesting">
+    <div class="section-sub" style="margin-top:0">The cost of leaving before a vesting cliff is real money. See if it's worth staying longer.</div>
+    <div class="slider-row"><span class="slider-label">Unvested balance</span><input type="range" min="0" max="50000" step="500" value="8000" id="v-bal" oninput="updateVest()"><span class="slider-val" id="v-bal-v">$8,000</span></div>
+    <div class="slider-row"><span class="slider-label">Months until vesting</span><input type="range" min="1" max="24" step="1" value="3" id="v-mo" oninput="updateVest()"><span class="slider-val" id="v-mo-v">3 mo</span></div>
+    <div class="slider-row"><span class="slider-label">Monthly salary</span><input type="range" min="3000" max="15000" step="250" value="5500" id="v-sal" oninput="updateVest()"><span class="slider-val" id="v-sal-v">$5,500</span></div>
+    <div class="metric-grid" id="v-metrics" style="margin-top:16px;"></div>
+    <div class="insight" id="v-insight"></div>
+    <hr>
+    <div class="section-label" style="margin-top:0">Vesting schedules explained</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">Cliff vesting</div><div class="stat-label">0% vested until a specific date — then 100% instantly. Common: 1-year cliff. Leave one day early: forfeit everything.</div></div>
+      <div class="stat-card"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">Graded vesting</div><div class="stat-label">Vest gradually: e.g. 20%/yr over 5 years. Each year you leave earlier costs a specific slice. Check your plan documents.</div></div>
+    </div>
+    <div class="insight insight-amber"><strong>Also check:</strong> RSU/stock option vesting dates, profit-sharing distributions, and whether your annual bonus has a "must be employed on payment date" clause. Timing your last day around these can be worth several months of salary.</div>
+  </div>
+
+  <!-- COVERAGE GAP TAB -->
+  <div class="tab-panel" id="jctab-coverage">
+    <div class="section-sub" style="margin-top:0">You have 60 days from your last day of employer coverage to enroll in COBRA or an ACA marketplace plan. After that, you're uninsured until your new employer's plan starts.</div>
+    <div class="insight insight-amber"><strong>FSA warning:</strong> If you have a Flexible Spending Account (FSA), it's use-it-or-lose-it. Spend down your balance before your last day — schedule dental, glasses, prescriptions. HSA funds are yours to keep regardless.</div>
+    <div class="section-label">Compare your options</div>
+    <div class="slider-row"><span class="slider-label">Monthly COBRA premium</span><input type="range" min="200" max="2500" step="25" value="650" id="cob-cobra" oninput="updateCobra()"><span class="slider-val" id="cob-cobra-v">$650</span></div>
+    <div class="slider-row"><span class="slider-label">Marketplace estimate</span><input type="range" min="50" max="800" step="25" value="220" id="cob-mkt" oninput="updateCobra()"><span class="slider-val" id="cob-mkt-v">$220</span></div>
+    <div class="slider-row"><span class="slider-label">Gap duration (months)</span><input type="range" min="1" max="6" step="1" value="2" id="cob-gap" oninput="updateCobra()"><span class="slider-val" id="cob-gap-v">2 mo</span></div>
+    <div class="metric-grid" id="cob-metrics" style="margin-top:16px;"></div>
+    <div class="insight" id="cob-insight"></div>
+    <hr>
+    <div class="section-label" style="margin-top:0">How to decide</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--amber)">Choose COBRA if…</div><div class="stat-label">You have ongoing care, prescriptions, or procedures already scheduled. Same doctors, same deductible mid-year. Worth the cost for continuity.</div></div>
+      <div class="stat-card"><div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--green)">Choose marketplace if…</div><div class="stat-label">You're healthy, gap is short, or you want to check for a subsidy. Go to <strong>healthcare.gov</strong> — most young professionals qualify for meaningful subsidies. Special enrollment starts your last day; subsidies are income-based and often larger than people expect.</div></div>
+    </div>
+    <div class="insight insight-blue"><strong>Tip:</strong> You can enroll in marketplace even if you haven't used COBRA yet. Job loss = qualifying life event = 60-day special enrollment period. You do not have to elect COBRA first.</div>
+  </div>
+
+  <!-- 30-DAY CHECKLIST TAB -->
+  <div class="tab-panel" id="jctab-checklist">
+    <div class="section-sub" style="margin-top:0">The 30 days before and after your last day. Each item has a deadline — miss them and the window closes.</div>
+    <div id="jc-ladder"></div>
+  </div>
+
+</div>
+
+</div><!-- /content -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+function fmt(n){if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(Math.max(n,0)).toLocaleString();}
+function fv(pv,mo,rate,yrs){const r=rate/100/12,n=yrs*12;if(Math.abs(r)<0.00001)return pv+mo*n;return pv*Math.pow(1+r,n)+mo*(Math.pow(1+r,n)-1)/r;}
+function fvFee(pv,mo,gross,fee,yrs){return fv(pv,mo,gross-fee,yrs);}
+function fedTax(inc,married){
+  // 2025 brackets (2026 brackets not yet confirmed — within ~2% of actual)
+  const br=married?[[23200,.1],[94300,.12],[201050,.22],[383900,.24],[487450,.32],[731200,.35],[Infinity,.37]]:[[11600,.1],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[609350,.35],[Infinity,.37]];
+  const std=married?29200:14600;
+  let t=0,p=0,tx=Math.max(inc-std,0);
+  for(const[top,r]of br){if(tx<=p)break;t+=(Math.min(tx,top)-p)*r;p=top;}
+  return t;
+}
+function stateTax(inc,key){
+  if(key==='none') return 0;
+  if(key==='mid') return inc*0.05;
+  if(key==='nj'){
+    // NJ 2024 brackets — all filing statuses
+    const br=[[20000,.014],[35000,.0175],[40000,.035],[75000,.05525],[500000,.0637],[1000000,.0897],[Infinity,.1075]];
+    let t=0,p=0;for(const[top,r]of br){if(inc<=p)break;t+=(Math.min(inc,top)-p)*r;p=top;}return t;
+  }
+  if(key==='ca'){
+    // CA 2024 brackets (single) + 1.1% SDI
+    const br=[[10756,.01],[25499,.02],[40245,.04],[55866,.06],[70606,.08],[360659,.093],[432787,.103],[721314,.113],[Infinity,.123]];
+    let t=0,p=0;for(const[top,r]of br){if(inc<=p)break;t+=(Math.min(inc,top)-p)*r;p=top;}return t+inc*0.011;
+  }
+  return inc*0.05;
+}
+function ficaCalc(sal){
+  // SS: 6.2% on first $176,100 (2025 wage base) · Medicare: 1.45% all wages · +0.9% above $200k
+  return Math.min(sal,176100)*0.062 + sal*0.0145 + Math.max(sal-200000,0)*0.009;
+}
+function estSalForTH(targetAnnTH,kAnn2,rmAnn2,married2,stateKey){
+  // Binary search: find gross salary that produces the needed annual take-home
+  let lo=20000,hi=600000;
+  for(let i=0;i<35;i++){const mid=(lo+hi)/2;const th=mid-ficaCalc(mid)-fedTax(mid-kAnn2,married2)-stateTax(mid,stateKey)-kAnn2-rmAnn2;if(th<targetAnnTH)lo=mid;else hi=mid;}
+  return Math.ceil((lo+hi)/2/5000)*5000;
+}
+
+function showMod(id,btn){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $('mod-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── M1: COMPOUND ── */
+let cChart=null;
+function updateC(){
+  const mo=+$('c-mo').value,rate=+$('c-rate').value,ret=+$('c-ret').value,age=+$('c-age').value;
+  $('c-mo-v').textContent='$'+mo.toLocaleString();$('c-rate-v').textContent=rate.toFixed(1)+'%';$('c-ret-v').textContent=ret;$('c-age-v').textContent=age;
+  const yN=Math.max(ret-age,1),yL=Math.max(ret-age-10,1);
+  const bN=fv(0,mo,rate,yN),bL=fv(0,mo,rate,yL),cN=mo*yN*12,cL=mo*yL*12;
+  $('c-metrics').innerHTML=`<div class="metric-card"><div class="metric-label">Start now (age ${age})</div><div class="metric-value" style="color:var(--green)">${fmt(bN)}</div><div class="metric-sub">${yN} yrs · ${fmt(cN)} contributed</div></div><div class="metric-card"><div class="metric-label">Start at age ${age+10}</div><div class="metric-value" style="color:var(--red)">${fmt(bL)}</div><div class="metric-sub">${yL} yrs · ${fmt(cL)} contributed</div></div>`;
+  $('c-insight').innerHTML=`Waiting 10 years costs <strong>${fmt(bN-bL)}</strong> at retirement — even though starting now only means contributing <strong>${fmt(cN-cL)}</strong> more. The rest is compound growth.`;
+  const labels=[],dN=[],dL=[];
+  for(let y=0;y<=yN;y++){labels.push(age+y);dN.push(Math.round(fv(0,mo,rate,y)));dL.push(Math.round(fv(0,mo,rate,Math.max(y-10,0))));}
+  const gc='rgba(0,0,0,0.05)',tc='rgba(0,0,0,0.4)';
+  if(cChart){cChart.data.labels=labels;cChart.data.datasets[0].data=dN;cChart.data.datasets[1].data=dL;cChart.update('none');}
+  else cChart=new Chart($('c-chart'),{type:'line',data:{labels,datasets:[{data:dN,borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.08)',fill:true,tension:0.4,pointRadius:0,borderWidth:2},{data:dL,borderColor:'#C94040',backgroundColor:'rgba(201,64,64,0.05)',fill:true,tension:0.4,pointRadius:0,borderWidth:2,borderDash:[5,4]}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}},scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc},title:{display:true,text:'Age',color:tc,font:{size:11}}},y:{ticks:{color:tc,font:{size:11},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1e3).toFixed(0)+'K'},grid:{color:gc}}}}});
+}
+
+/* ── M2: LADDER ── */
+function renderLadder(){
+  const plan=$('a-plan').value,isSimple=plan==='simple';
+  const hasMatch=$('a-match').value==='yes';
+  const hasHSA=$('a-hsa').value==='yes';
+  const hasDebt=$('a-debt').value==='yes';
+  const loans=$('a-loans').value;
+  $('a-simple-size').style.display=isSimple?'flex':'none';
+  const simpleMax=isSimple?+$('a-simple-emp').value:0;
+  const retLim=isSimple?simpleMax:24500;
+  const sal=+$('a-sal').value;
+  const matchPct=+$('p-match').value;
+  const matchAnn=matchPct>0?Math.round(sal*matchPct/100):0;
+  const retLabel=isSimple?'SIMPLE IRA':'401k';
+  const steps=[];
+  // Step 0: High-interest debt
+  if(hasDebt) steps.push({
+    id:'debt',clr:'#8B2020',bg:'#FCEBEB',
+    title:'Pay off high-interest debt first',
+    sub:'Any debt above 7% APR beats any investment return.',
+    tags:[{t:'Priority #0',s:'background:#FCEBEB;color:#8B2020'},{t:'>7% APR',s:'background:#FCEBEB;color:#8B2020'}],
+    lim:'Exception: still capture the employer match — that\'s a guaranteed 50–100% return that beats even 20% debt',
+    det:'Credit cards typically charge 20–29% APR. Paying that off is a guaranteed 20%+ return — better than any stock market outcome. <strong>Order:</strong> Capture employer match first (guaranteed return), then attack high-interest debt aggressively before investing anywhere else.<br><br><strong>What counts as high-interest:</strong> Credit cards, personal loans, Buy-Now-Pay-Later balances, store cards. Auto loans and student loans are usually lower and handled separately.',
+    why:'A 25% APR credit card balance earns the equivalent of a 25% guaranteed return when paid off. No index fund does that.'
+  });
+  // Step 1: Contribute to match
+  if(hasMatch) steps.push({
+    id:'match',clr:'#1A7A5E',bg:'#E6F4EF',
+    title:`${retLabel} — up to employer match`,
+    sub:'Free money. Always do this first.',
+    tags:[{t:'Free money',s:'background:#E6F4EF;color:#0D4D38'},{t:isSimple?'Pre-tax only':'Pre-tax or Roth',s:'background:#E8F0FB;color:#0D2D5C'}],
+    lim:(matchPct>0?`At $${sal.toLocaleString()}: contribute ${matchPct}% = $${matchAnn.toLocaleString()}/yr to get full match · `:``)+'2026 limit: $'+retLim.toLocaleString()+' total',
+    det:isSimple
+      ?`Your employer is required by law to either match dollar-for-dollar up to 3% of your salary, or contribute a flat 2% for everyone. Contribute at least enough to get the full match.<br><br><strong>No Roth option:</strong> SIMPLE IRAs are always pre-tax. You'll owe taxes on withdrawals in retirement.`
+      :`Your employer match is an immediate 50–100% return before your money is even invested. If your employer matches 50% up to 6% of salary, contribute at least 6%.<br><br><strong>Roth vs Traditional 401k:</strong> In your 20s your bracket is likely the lowest it will ever be. Paying taxes now (Roth) and never again is almost always the right move.`,
+    why:`A 50–100% guaranteed return on day one. No index fund can touch that.`
+  });
+  // Step 2: Emergency fund (always)
+  steps.push({
+    id:'emrg',clr:'#2563A8',bg:'#E8F0FB',
+    title:'Emergency fund — 3–6 months expenses',
+    sub:'Cash, not invested. High-yield savings account.',
+    tags:[{t:'Cash',s:'background:#F3F1EC;color:#555'},{t:'HYSA',s:'background:#F3F1EC;color:#555'}],
+    lim:'Target: 3 months minimum · HYSA rates: check bankrate.com for current rates',
+    det:'Keeps you from raiding retirement accounts when life happens — job loss, car repair, medical bill. High-yield savings account (Marcus, Ally, Fidelity SPAXX): stable, FDIC insured, accessible in 1–2 days. Not invested — this is your safety net, not your portfolio.',
+    why:'Without this, one bad month unravels years of investing.'
+  });
+  // Student loans (conditional, between emergency fund and Roth)
+  if(loans!=='no') steps.push({
+    id:'loans',clr:loans==='pslf'?'#2563A8':loans==='high'?'#8B2020':'#C97B1A',
+    bg:loans==='pslf'?'#E8F0FB':loans==='high'?'#FCEBEB':'#FDF3E3',
+    title:loans==='pslf'?'Student loans — minimum payments only (PSLF)':loans==='high'?'Student loans — pay aggressively (>7% rate)':'Student loans — pay on schedule, invest alongside',
+    sub:loans==='pslf'?'You\'re on track for forgiveness — don\'t overpay.':loans==='high'?'High rate loans: pay these before investing beyond the match.':'Low rate loans: the math favors investing, not prepaying.',
+    tags:loans==='pslf'?[{t:'PSLF',s:'background:#E8F0FB;color:#0D2D5C'},{t:'Pay minimum',s:'background:#E8F0FB;color:#0D2D5C'}]:loans==='high'?[{t:'High priority',s:'background:#FCEBEB;color:#8B2020'},{t:'>7% rate',s:'background:#FCEBEB;color:#8B2020'}]:[{t:'Low priority',s:'background:#FDF3E3;color:#5C3700'},{t:'<7% rate',s:'background:#FDF3E3;color:#5C3700'}],
+    lim:loans==='pslf'?'Must work for a qualifying employer (government, nonprofit) · 120 qualifying payments · use income-driven repayment':loans==='high'?'Above ~7%, paying off debt beats investing in a taxable account':'Below ~7%, expected investment returns likely exceed the interest cost',
+    det:loans==='pslf'?`Public Service Loan Forgiveness forgives the remaining balance after 10 years of qualifying payments at a qualifying employer (government agencies, 501(c)(3) nonprofits, many hospitals). If you qualify, paying <em>more</em> than the minimum is throwing money away — the forgiven amount is the same regardless.<br><br><strong>Must do:</strong> Enroll in an income-driven repayment plan (SAVE, IBR, or PAYE), work at a qualifying employer, and submit the Employment Certification Form annually.`:
+      loans==='high'?`At rates above 7%, aggressively paying down student loans is often better than investing in a taxable brokerage — you'd need the market to beat that rate after taxes, which isn't guaranteed.<br><br><strong>Exception:</strong> Always invest enough to capture the full employer match first (guaranteed 50–100% return), and always max the Roth IRA (tax-free growth means the real return is higher than the nominal rate suggests).<br><br>After match + Roth: direct extra cash to student loans before taxable investing.`:
+      `At rates below 7%, the historical equity premium suggests investing will likely beat the after-tax cost of the debt over time. Pay the minimum and invest the rest.<br><br>That said, debt is a guaranteed cost and investments aren't — if the psychological burden of debt affects your life, paying extra is worth something regardless of the math.`,
+    why:loans==='pslf'?'PSLF is one of the most valuable benefits available to public-sector workers — but only if you follow the rules exactly.':loans==='high'?'At >7%, paying off debt is the investment. Guaranteed return, no market risk.':'Mathematical edge goes to investing, but the right answer depends on your risk tolerance and how much the debt bothers you.'
+  });
+  // Step 3: Roth IRA (always, but SIMPLE has a 2-year rule caveat)
+  steps.push({
+    id:'roth',clr:'#5B4DC4',bg:'#EDEBFB',
+    title:'Roth IRA — max it out',
+    sub:'Your most powerful long-term account.',
+    tags:[{t:'Tax-free growth',s:'background:#E6F4EF;color:#0D4D38'},{t:'$7,000/yr',s:'background:#E8F0FB;color:#0D2D5C'}],
+    lim:'2026: $7,000/yr · income limit $165K single / $246K married',
+    det:`You contribute after-tax dollars while your bracket is low — and every dollar of growth comes out completely tax-free in retirement.<br><br><strong>What to buy:</strong> FZROX (Fidelity, zero fee), FSKAX, or VTI. Automate monthly contributions.`+(isSimple?`<br><br><strong>SIMPLE IRA note:</strong> You cannot roll your SIMPLE IRA into a traditional IRA or 401k for the first 2 years — but a separate Roth IRA is always fine to open and fund independently.`:''),
+    why:`$7,000/year at 23 at 4% real return = ~$700K in today's dollars at 65. Tax-free.`
+  });
+  // Step 4: HSA (if eligible)
+  if(hasHSA) steps.push({
+    id:'hsa',clr:'#1A7A5E',bg:'#E6F4EF',
+    title:'HSA — max it out',
+    sub:'The triple tax advantage most people ignore.',
+    tags:[{t:'Triple tax-free',s:'background:#E6F4EF;color:#0D4D38'},{t:'HDHP required',s:'background:#E8F0FB;color:#0D2D5C'}],
+    lim:'2026: $4,400 individual · $8,750 family',
+    det:'Contributions pre-tax, growth tax-free, withdrawals for medical tax-free. No other account does all three.<br><br><strong>Strategy:</strong> Invest in index funds, pay medical out of pocket now, save receipts. After 65 withdraw for anything.',
+    why:`Pre-tax in, tax-free growth, tax-free out for medical. Better than a Roth for healthcare costs.`
+  });
+  // Step 5: Fill retirement plan to limit
+  steps.push({
+    id:'retfill',clr:'#1A7A5E',bg:'#E6F4EF',
+    title:`${retLabel} — fill it to the limit`,
+    sub:'Come back after the Roth IRA is maxed.',
+    tags:[{t:isSimple?'Pre-tax only':'Pre-tax or Roth',s:'background:#E8F0FB;color:#0D2D5C'},{t:`$${retLim.toLocaleString()}/yr`,s:'background:#E8F0FB;color:#0D2D5C'}],
+    lim:`2026: $${retLim.toLocaleString()} total including earlier match contributions`,
+    det:isSimple
+      ?`After maxing the Roth IRA, fill the SIMPLE IRA to its limit. Investment options may be limited — contribute anyway for the tax deferral.<br><br><strong>2-year rule:</strong> For the first 2 years after your first SIMPLE IRA contribution, you can only roll it into another SIMPLE IRA — not a 401k or traditional IRA. After 2 years, normal rollover rules apply.`
+      :`After maxing the Roth IRA, fill the 401k. Most plans have limited fund choices — that is why the Roth comes first. But tax deferral is still worth it once the Roth is maxed.`,
+    why:`Tax-deferred compounding still beats taxable, even with mediocre fund options.`
+  });
+  // Step 6: Taxable brokerage (always last)
+  const stepNum=steps.length+1;
+  steps.push({
+    id:'tax',clr:'#C97B1A',bg:'#FDF3E3',
+    title:'Taxable brokerage — invest the rest',
+    sub:'No limits, full flexibility.',
+    tags:[{t:'No limit',s:'background:#FDF3E3;color:#5C3700'},{t:'Flexible',s:'background:#FDF3E3;color:#5C3700'}],
+    lim:'No contribution limit · long-term capital gains: 0%, 15%, 20%',
+    det:'Once all tax-advantaged accounts are maxed, a taxable brokerage at Fidelity or Vanguard is next. Same funds — VTI, FSKAX. Buy and hold. Long-term capital gains rates are much lower than ordinary income.',
+    why:`After maxing every tax-advantaged account, this is just investing. Keep it boring.`
+  });
+  let h='';
+  steps.forEach((s,i)=>{
+    const tags=s.tags.map(t=>`<span class="tag" style="${t.s}">${t.t}</span>`).join('');
+    h+=`${i>0?'<div class="connector"></div>':''}<div class="step-card" id="sc-${s.id}" onclick="toggleStep('${s.id}')"><div class="step-header"><div class="step-num" style="background:${s.bg};color:${s.clr}">${i+1}</div><div style="flex:1"><div class="step-title">${s.title}</div><div class="step-sub">${s.sub}</div></div><span id="sch-${s.id}" style="color:var(--text-3);font-size:18px;transition:transform .2s">›</span></div><div class="step-detail" id="sd-${s.id}"><div style="margin-bottom:8px">${tags}</div><div style="font-size:11px;color:var(--text-3);margin-bottom:10px">📌 ${s.lim}</div>${s.det}<div class="why"><strong>Why this order:</strong> ${s.why}</div></div></div>`;
+  });
+  $('a-ladder').innerHTML=h;
+}
+function toggleStep(id){const d=$('sd-'+id),c=$('sc-'+id),ch=$('sch-'+id);const open=d.classList.toggle('open');c.classList.toggle('open',open);ch.style.transform=open?'rotate(90deg)':'';}
+
+/* ── M3: PAYCHECK ── */
+const pBudgets={
+  manhattan:{label:'Manhattan',rentSolo:3500,rentShare:2100,
+    note:'Manhattan (~2026 market)',items:[
+    {n:'Rent',v:3500},{n:'Groceries + dining out',v:750},
+    {n:'Transit (subway)',v:135},{n:'Utilities + phone',v:300},
+    {n:'Clothing + personal care',v:200},{n:'Entertainment + subscriptions',v:350}]},
+  nj_boros:{label:'NYC outer boroughs',rentSolo:2300,rentShare:1800,
+    note:'Brooklyn or Queens (~2026 market)',items:[
+    {n:'Rent',v:2300},{n:'Groceries + dining out',v:625},
+    {n:'Transit (subway)',v:175},{n:'Utilities + phone',v:175},
+    {n:'Clothing + personal care',v:150},{n:'Entertainment + subscriptions',v:275}]},
+  nj_across:{label:'NJ across from NYC',rentSolo:2700,rentShare:2000,
+    note:'Jersey City or Hoboken (~2026 market) · NJ Transit adds ~$90/mo vs subway',items:[
+    {n:'Rent',v:2700},{n:'Groceries + dining out',v:600},
+    {n:'Transit (NJ Transit + subway)',v:225},{n:'Utilities + phone',v:200},
+    {n:'Clothing + personal care',v:150},{n:'Entertainment + subscriptions',v:250}]},
+  mid:{label:'Mid-cost city',rentSolo:1400,rentShare:900,
+    note:'Chicago, Denver, Austin, Nashville, etc.',items:[
+    {n:'Rent',v:1400},{n:'Groceries + dining out',v:425},
+    {n:'Transport (car or transit)',v:250},{n:'Utilities + phone',v:150},
+    {n:'Clothing + personal care',v:100},{n:'Entertainment + subscriptions',v:175}]},
+  low:{label:'Lower-cost area',rentSolo:950,rentShare:650,
+    note:'Midwest, Southeast, smaller cities',items:[
+    {n:'Rent',v:950},{n:'Groceries + dining out',v:375},
+    {n:'Transport (car)',v:300},{n:'Utilities + phone',v:130},
+    {n:'Clothing + personal care',v:85},{n:'Entertainment + subscriptions',v:135}]}
+};
+
+/* ── CROSS-TAB SYNC ── */
+function syncSal(src){
+  const v=src==='a'?+$('a-sal').value:+$('p-sal').value;
+  $('a-sal').value=v;$('p-sal').value=v;
+  $('a-sal-v').textContent='$'+v.toLocaleString();
+  $('p-sal-v').textContent='$'+v.toLocaleString();
+  renderLadder();updateP();
+}
+function syncPlan(src){
+  const v=src==='a'?$('a-plan').value:$('p-plan').value;
+  $('a-plan').value=v;$('p-plan').value=v;
+  updatePlan();renderLadder();
+}
+function syncEmpSize(src){
+  const v=src==='a'?$('a-simple-emp').value:$('p-simple-emp').value;
+  $('a-simple-emp').value=v;$('p-simple-emp').value=v;
+  updatePlan();renderLadder();
+}
+function syncMatch(src){
+  if(src==='a'){
+    const hasM=$('a-match').value==='yes';
+    if(!hasM){$('p-match').value=0;}
+    else if(+$('p-match').value===0){$('p-match').value=3;}
+  } else {
+    $('a-match').value=+$('p-match').value>0?'yes':'no';
+  }
+  updateP();renderLadder();
+}
+
+function updatePlan(){
+  const plan=$('p-plan').value,isSimple=plan==='simple';
+  $('p-simple-size').style.display=isSimple?'flex':'none';
+  const maxAnn=isSimple?+$('p-simple-emp').value:24500;
+  const freq=+$('p-freq').value;
+  // Cap retirement plan slider — floor so annual never exceeds IRS limit
+  const maxPP=Math.floor(maxAnn/freq);
+  const contrib=$('p-contrib');
+  contrib.max=maxPP;
+  contrib.step=25;
+  if(+contrib.value>maxPP) contrib.value=maxPP;
+  // Cap Roth slider — $7,000/yr IRS limit
+  const rothMaxPP=Math.floor(7000/freq);
+  const roth=$('p-roth');
+  roth.max=rothMaxPP;
+  roth.step=25;
+  if(+roth.value>rothMaxPP) roth.value=rothMaxPP;
+  const planLabel=isSimple?'SIMPLE IRA':'401k';
+  $('p-contrib-lbl').innerHTML=planLabel+' <span style="font-size:10px;color:var(--text-3)" id="p-contrib-max-lbl">(max $'+maxAnn.toLocaleString()+'/yr)</span>';
+  $('p-plan-legend').textContent=planLabel;
+  updateP();
+}
+function updateP(){
+  const sal=+$('p-sal').value,married=$('p-filing').value==='married',stateKey=$('p-state').value;
+  const freq=+$('p-freq').value;
+  const freqLabel={26:'Biweekly',24:'Semi-monthly',52:'Weekly',12:'Monthly'}[freq]||'Biweekly';
+  const plan=$('p-plan').value,isSimple=plan==='simple';
+  const planLabel=isSimple?'SIMPLE IRA':'401k';
+  // Per-paycheck slider values
+  const kPP=+$('p-contrib').value;   // retirement plan per paycheck
+  const rmPP=+$('p-roth').value;     // Roth per paycheck
+  // Annual amounts
+  const kAnn=kPP*freq,rmAnn=rmPP*freq;
+  // Monthly equivalents for tax math
+  const kMo=kAnn/12,rmMo=rmAnn/12;
+  const matchPct=+$('p-match').value;
+  $('p-sal-v').textContent='$'+sal.toLocaleString();
+  $('p-match-v').textContent=matchPct+'%';
+  $('p-roth-v').textContent='$'+rmPP+'/pp';
+  $('p-contrib-v').textContent='$'+kPP+'/pp';
+  $('p-bar-label').textContent=freqLabel+' per-paycheck breakdown';
+  // Match callout
+  const matchMinPP=matchPct>0?Math.ceil(sal*matchPct/100/freq):0;
+  const matchAnnValue=Math.round(sal*matchPct/100);
+  const mc=$('p-match-callout');
+  if(matchPct===0){mc.style.display='none';}
+  else if(kPP>=matchMinPP){
+    mc.style.cssText='margin:-4px 0 10px 0;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5;background:#E8F5F0;border:1px solid #A8D5C2;color:#1D6B52';
+    mc.innerHTML=`<strong>Match captured ✓</strong> — You're contributing $${kPP}/pp, at or above the $${matchMinPP}/pp minimum. Free money: <strong>$${matchAnnValue.toLocaleString()}/yr</strong> from employer.`;
+  } else {
+    mc.style.cssText='margin:-4px 0 10px 0;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5;background:#FDF3E3;border:1px solid #E8C97A;color:#7B4F00';
+    mc.innerHTML=`<strong>Leaving free money on the table.</strong> Contribute at least <strong>$${matchMinPP}/pp</strong> ($${(matchMinPP*freq).toLocaleString()}/yr) to capture your full employer match — worth <strong>$${matchAnnValue.toLocaleString()}/yr</strong>.`;
+  }
+  // Gross per-paycheck — accurate FICA (SS wage base capped) + progressive state tax
+  const grossPP=sal/freq,grossMo=sal/12;
+  const fica=ficaCalc(sal)/12;
+  const fedAnn=fedTax(sal-kAnn,married),fedMo=fedAnn/12;
+  const stateMo=stateTax(sal,stateKey)/12;
+  const th=grossMo-fica-fedMo-stateMo-kMo-rmMo;
+  const bFed=fedTax(sal,married)/12,bTH=grossMo-ficaCalc(sal)/12-bFed-stateTax(sal,stateKey)/12;
+  const taxSave=bFed-fedMo,thDrop=bTH-th,thSafe=Math.max(th,0);
+  const totalAnnInvested=kAnn+rmAnn;
+  // Per-paycheck display values
+  const fedPP=fedMo*12/freq,ficaPP=fica*12/freq,statePP=stateMo*12/freq;
+  const thPP=grossPP-fedPP-ficaPP-statePP-kPP-rmPP,thPPsafe=Math.max(thPP,0);
+  $('p-metrics').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Per-paycheck take-home</div><div class="metric-value" style="color:${thPP<0?'var(--red)':'var(--green)'}">$${Math.round(thPPsafe).toLocaleString()}${thPP<0?' ⚠':''}</div><div class="metric-sub">${freqLabel.toLowerCase()}, after taxes + savings</div></div>
+    <div class="metric-card"><div class="metric-label">Annual savings</div><div class="metric-value" style="color:var(--purple)">$${totalAnnInvested.toLocaleString()}</div><div class="metric-sub">${planLabel} $${kAnn.toLocaleString()} + Roth $${rmAnn.toLocaleString()}</div></div>
+    <div class="metric-card"><div class="metric-label">Savings rate</div><div class="metric-value" style="color:var(--purple)">${Math.round(totalAnnInvested/sal*100)}%</div><div class="metric-sub">of gross income</div></div>
+    <div class="metric-card"><div class="metric-label">Tax subsidy on ${planLabel}</div><div class="metric-value" style="color:var(--green)">$${Math.round(taxSave*12).toLocaleString()}/yr</div><div class="metric-sub">real cost to you: $${Math.round((kAnn-taxSave*12)).toLocaleString()}/yr</div></div>`;
+  $('p-insight').innerHTML=`Investing <strong>$${totalAnnInvested.toLocaleString()}/yr</strong> but take-home only drops <strong>$${Math.round(thDrop*12).toLocaleString()}/yr</strong> vs saving nothing — because ${planLabel} contributions reduce taxable income. The government subsidizes <strong>$${Math.round(taxSave*12).toLocaleString()}/yr</strong> of your ${planLabel}.`;
+  const p=v=>Math.max((v/grossPP)*100,0).toFixed(1);
+  $('p-bar').innerHTML=`<div class="bar-seg" style="width:${p(fedPP)}%;background:#C94040;color:#fff">${+p(fedPP)>7?'Fed':''}</div><div class="bar-seg" style="width:${p(ficaPP)}%;background:#E8917A;color:#fff">${+p(ficaPP)>6?'FICA':''}</div><div class="bar-seg" style="width:${p(statePP)}%;background:#F0C97A;color:#5C3700">${+p(statePP)>5?'State':''}</div><div class="bar-seg" style="width:${p(kPP)}%;background:#9B91E8;color:#fff">${+p(kPP)>5?planLabel:''}</div><div class="bar-seg" style="width:${p(rmPP)}%;background:#BEB8F5;color:#26215C">${+p(rmPP)>5?'Roth':''}</div><div class="bar-seg" style="width:${p(thPPsafe)}%;background:#1A7A5E;color:#fff">${+p(thPPsafe)>10?'Take-home':''}</div>`;
+  const td=(label,val,color,indent)=>`<tr><td style="color:var(--text-3);padding:6px 0${indent?' 6px 12px':''};border-bottom:1px solid var(--border)">${label}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);font-weight:500${color?';color:'+color:''}">${val}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">${val2col(val,color)}</td></tr>`;
+  function val2col(v,c){return '';}
+  const fmt2=(pp,ann)=>`<span style="font-weight:600">$${Math.round(pp).toLocaleString()}</span><span style="color:var(--text-3);font-size:11px;margin-left:6px">$${Math.round(ann).toLocaleString()}/yr</span>`;
+  $('p-table').innerHTML=`
+    <tr style="font-size:11px;color:var(--text-3)"><td style="padding:4px 0 6px">Item</td><td style="text-align:right;padding:4px 0 6px">Per paycheck</td><td style="text-align:right;padding:4px 0 6px">Annual</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0;border-bottom:1px solid var(--border)">Gross pay</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);font-weight:600">$${Math.round(grossPP).toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">$${sal.toLocaleString()}</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">Federal income tax</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red)">−$${Math.round(fedPP).toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">−$${Math.round(fedAnn).toLocaleString()}</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">FICA (SS + Medicare)</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red)">−$${Math.round(ficaPP).toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">−$${Math.round(fica*12).toLocaleString()}</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">State income tax</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red)">−$${Math.round(statePP).toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">−$${Math.round(stateMo*12).toLocaleString()}</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">${planLabel}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--purple)">−$${kPP.toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">−$${kAnn.toLocaleString()}</td></tr>
+    <tr><td style="color:var(--text-3);padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">Roth IRA (bank transfer — not payroll)</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--purple)">−$${rmPP.toLocaleString()}</td><td style="text-align:right;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text-3);font-size:12px">−$${rmAnn.toLocaleString()}</td></tr>
+    <tr><td style="padding:10px 0;font-weight:600;font-size:14px">Take-home</td><td style="text-align:right;padding:10px 0;color:${thPP<0?'var(--red)':'var(--green)'};font-size:16px;font-weight:600">$${Math.round(thPPsafe).toLocaleString()}${thPP<0?' ⚠':''}</td><td style="text-align:right;padding:10px 0;color:var(--text-3);font-size:12px">$${Math.round(thSafe*12).toLocaleString()}/yr</td></tr>
+    <tr><td style="color:var(--text-3);font-size:11px;padding:2px 0">Govt subsidy on ${planLabel}</td><td colspan="2" style="text-align:right;color:var(--green);font-size:11px;padding:2px 0">+$${Math.round(taxSave*12).toLocaleString()}/yr</td></tr>`;
+  // ── Livability check ──
+  const bud=pBudgets[$('p-loc').value];
+  const liveSit=$('p-live').value;
+  const familySupport=+$('p-support').value;
+  $('p-support-v').textContent='$'+familySupport.toLocaleString()+'/mo';
+  // Compute rent based on living situation
+  const rentAmt=liveSit==='home'?0:liveSit==='share'?bud.rentShare:bud.rentSolo;
+  // Rebuild items with dynamic rent; if living at home reduce groceries too
+  const grocAdj=liveSit==='home'?-200:0;
+  const budItems=bud.items.map((it,i)=>i===0?{n:it.n+(liveSit==='share'?' (shared)':liveSit==='home'?' (at home)':''),v:rentAmt}:i===1?{n:it.n,v:it.v+grocAdj}:it);
+  const budBase=budItems.reduce((s,i)=>s+i.v,0);
+  const budTotal=Math.max(budBase-familySupport,0);
+  const moTH=Math.round(thSafe);
+  const surplus=moTH-budTotal;
+  const good=surplus>400,tight=surplus>=0&&surplus<=400,short=surplus<0;
+  const hue=good?{bg:'#E8F5F0',bd:'#A8D5C2',tx:'#1D6B52',label:'Comfortable'}
+               :tight?{bg:'#FDF3E3',bd:'#E8C97A',tx:'#7B4F00',label:'Tight'}
+               :{bg:'#FCEBEB',bd:'#E8A0A0',tx:'#8B2020',label:'Not enough'};
+  const neededSal=estSalForTH(budTotal*12,kAnn,rmAnn,married,stateKey);
+  let rows=budItems.map(i=>`<tr><td style="padding:5px 0;color:var(--text-3);border-bottom:1px solid var(--border)">${i.n}</td><td style="text-align:right;padding:5px 0;border-bottom:1px solid var(--border)">$${i.v.toLocaleString()}</td></tr>`).join('');
+  if(familySupport>0) rows+=`<tr><td style="padding:5px 0;color:var(--green);border-bottom:1px solid var(--border)">Family support</td><td style="text-align:right;padding:5px 0;border-bottom:1px solid var(--border);color:var(--green)">−$${familySupport.toLocaleString()}</td></tr>`;
+  rows+=`<tr><td style="padding:8px 0;font-weight:600">Monthly expenses</td><td style="text-align:right;padding:8px 0;font-weight:600">$${budTotal.toLocaleString()}</td></tr>`;
+  const surplusSign=surplus>=0?'+':'-';
+  const surplusAbs=Math.abs(Math.round(surplus)).toLocaleString();
+  // Living at home callout — show the compounding value of saved rent
+  let homeCallout='';
+  if(liveSit==='home'){
+    const soloRentSaved=bud.rentSolo-grocAdj; // rent + grocery savings
+    const yearsCompound=40-Math.max(23-23,0);
+    const compounded=Math.round(fv(0,soloRentSaved,7,35)/1000)*1000;
+    homeCallout=`<div class="insight insight-green" style="margin-top:10px"><strong>Living at home saves ~$${bud.rentSolo.toLocaleString()}/mo on rent alone.</strong> Invested instead: that's roughly <strong>$${(compounded/1e6).toFixed(1)}M</strong> over 35 years at 7% nominal. Two or three years of this during your early career is one of the most powerful financial moves you can make.</div>`;
+  }
+  let insight='';
+  if(short){
+    insight=`<div class="insight" style="margin-top:10px;background:#FCEBEB;border-left-color:#C94040">You're <strong>$${Math.abs(Math.round(surplus)).toLocaleString()}/mo short</strong> of covering ${bud.label} expenses with these contribution levels. The fix isn't to skip retirement — it's salary. You'd need roughly <strong>~$${neededSal.toLocaleString()}</strong> to cover this lifestyle while fully maxing your accounts. Until then: capture the employer match first, max the Roth second, and fill the ${planLabel} last as salary grows.</div>`;
+  } else if(tight){
+    insight=`<div class="insight insight-amber" style="margin-top:10px">You have <strong>$${Math.round(surplus).toLocaleString()}/mo</strong> above expenses — workable, but one bad month could hurt. Build 3–6 months in a HYSA before pushing contributions to the max.</div>`;
+  } else {
+    insight=`<div class="insight" style="margin-top:10px">After maxing your accounts, you have <strong>$${Math.round(surplus).toLocaleString()}/mo</strong> above typical expenses. Solid. Once your emergency fund is set, any extra can go into a taxable brokerage — same VTI + VXUS, no contribution limit.</div>`;
+  }
+  const noteText=liveSit==='home'?'Living at home — expenses reflect no rent, reduced groceries':liveSit==='share'?bud.note+' — sharing with one roommate':bud.note+' — living alone';
+  $('p-budget').innerHTML=`
+    <div style="font-size:11px;color:var(--text-3);margin-top:4px;margin-bottom:10px">${noteText}</div>
+    <table style="width:100%;font-size:13px;border-collapse:collapse">${rows}</table>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:10px;margin-top:14px;background:${hue.bg};border:1px solid ${hue.bd}">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${hue.tx};margin-bottom:4px">${hue.label}</div>
+        <div style="font-size:13px;color:var(--text)">Take-home <strong>$${moTH.toLocaleString()}/mo</strong> vs expenses <strong>$${budTotal.toLocaleString()}/mo</strong></div>
+      </div>
+      <div style="font-size:26px;font-weight:800;color:${hue.tx};letter-spacing:-1px">${surplusSign}$${surplusAbs}</div>
+    </div>
+    ${homeCallout}${insight}`;
+}
+
+/* ── M4: ROTH ── */
+const rN={start:{q:"What type of account are you deciding on?",sub:"The Roth vs Traditional choice applies to both IRAs and 401ks — the logic is similar for both.",opts:[{l:"IRA (I'm opening one myself)",n:"income"},{l:"401k (through employer)",n:"mq"},{l:"Both / not sure",n:"income"}]},income:{q:"What's your approximate gross income?",sub:"Roth IRA phase-out: $150K–$165K single / $236K–$246K married (2025). Above those ranges: Backdoor Roth.",opts:[{l:"Under $80K",n:"lg"},{l:"$80K–$150K",n:"md"},{l:"$150K–$236K",n:"hi"},{l:"Over $236K",n:"bq"}]},mq:{q:"Does your employer offer a Roth 401k option?",sub:"Many employers now offer both. Check your plan documents or ask HR.",opts:[{l:"Yes, both options",n:"income"},{l:"No, Traditional only",n:"to"},{l:"Not sure",n:"income"}]},lg:{q:"Do you expect your income to grow significantly?",sub:"Early career = likely lowest tax bracket of your life.",opts:[{l:"Yes, income will grow",n:"rrs"},{l:"Income stays similar",n:"rrl"},{l:"Not sure",n:"rrl"}]},md:{q:"Are you in a temporarily high-income year?",sub:"A bonus, side business windfall, or unusual income spike that won't repeat — Traditional can make sense to reduce that year's taxes.",opts:[{l:"Yes, unusually high this year",n:"rsp"},{l:"No, this is typical for me",n:"rrm"},{l:"Not sure",n:"rrm"}]},hi:{q:"Do you expect lower income in retirement?",sub:"Lower retirement bracket → paying taxes later (Traditional) can be better.",opts:[{l:"Yes, likely lower bracket",n:"rtl"},{l:"No, similar or higher",n:"rsp"},{l:"Not sure",n:"rsp"}]},bq:{q:"Comfortable with a slightly more complex strategy?",sub:"Above the limit: Backdoor Roth is the legal workaround.",opts:[{l:"Yes, I'll look into it",n:"rbd"},{l:"Keep it simple",n:"rth"},{l:"Tell me more",n:"rbd"}]},to:{q:"Can you also open a separate Roth IRA?",sub:"Even with a Traditional-only 401k, you can get Roth exposure via a separate Roth IRA.",opts:[{l:"Yes, I can open one",n:"rco"},{l:"Just the 401k for now",n:"rt4"}]},rrs:{result:true,type:'roth',title:'Roth — strongly recommended',body:'Low bracket now, income rising — the ideal Roth scenario. Pay a low tax rate today and all future growth comes out completely tax-free.<br><br><strong>Action:</strong> Open a Roth IRA at Fidelity or Vanguard. Contribute $7,000/yr ($583/mo or $269/paycheck biweekly). Buy <strong>FZROX + FZILX</strong> (Fidelity, 0% fee) or <strong>VTI + VXUS</strong> (Vanguard/Schwab) — ~80% US, ~20% international.<br><br><strong>Deadline:</strong> You can fund the current year\'s Roth up until April 15 of the following year — don\'t wait.',tip:'Every dollar in a Roth at 22–25 is taxed at your lowest lifetime rate. That gap compounds for 40 years.'},rrl:{result:true,type:'roth',title:'Roth — recommended',body:'Even without dramatic income growth, Roth makes sense at lower incomes. Low tax rate now, plus Roth flexibility — no required withdrawals, contributions accessible penalty-free.<br><br><strong>Action:</strong> Max the Roth IRA ($7,000/yr) before adding to taxable brokerage.<br><br><strong>Deadline:</strong> You can contribute for the current tax year up until April 15 of the following year.',tip:"You can always withdraw original contributions (not earnings) penalty-free. It doubles as a last-resort emergency fund."},rrm:{result:true,type:'roth',title:'Roth — likely the right call',body:'Probably in the 22% federal bracket — historically low. Paying 22% now to never pay taxes again on decades of compound growth is a solid trade.<br><br><strong>Action:</strong> Max the Roth IRA ($7,000/yr). You can fund the current tax year up until April 15 of the following year.',tip:'Tax rates could rise. Locking in today\'s rate with a Roth is a form of tax insurance.'},rtl:{result:true,type:'trad',title:'Traditional — worth considering',body:'High bracket now, lower retirement income expected — deferring taxes makes mathematical sense. Get a deduction at a high rate, pay later at a lower rate.<br><br>Consider Roth conversions during lower-income early retirement.',tip:'Traditional now → Roth conversions in early retirement is a common high-earner strategy.'},rsp:{result:true,type:'split',title:'Split strategy — both accounts',body:'Diversify tax exposure: some Traditional (lowers taxes now), some Roth (tax-free later). Hedge against future tax rate uncertainty.<br><br><strong>Order:</strong> 401k to match → max Roth IRA → fill 401k → taxable.',tip:'Both Traditional and Roth in retirement = pull from whichever minimizes your bracket each year.'},rbd:{result:true,type:'both',title:'Backdoor Roth IRA',body:'Standard move for high earners:<br><br>1. Contribute $7,000 to Traditional IRA (non-deductible)<br>2. Convert to Roth shortly after<br>3. Pay taxes only on any growth between steps (usually minimal)<br><br>Watch for the pro-rata rule if you have other pre-tax IRA money.',tip:'Legal, widely used, explicitly allowed by the IRS. Many high-income professionals use it every year.'},rth:{result:true,type:'trad',title:'Traditional 401k — maximize the deduction',body:'Max your Traditional 401k ($24,500 in 2026). Pre-tax deduction meaningfully lowers taxable income now.<br><br>Later: Roth conversions during lower-income early retirement — a "Roth conversion ladder."',tip:'High earners often do Traditional during peak years, convert to Roth in early retirement.'},rco:{result:true,type:'both',title:'Traditional 401k + Roth IRA — best of both',body:'Use Traditional 401k for the deduction and match, open a separate Roth IRA for tax-free growth.<br><br><strong>Priority:</strong> 401k to match → max Roth IRA → fill 401k → taxable.',tip:'Tax diversification = control which account you pull from each year to manage your bracket.'},rt4:{result:true,type:'trad',title:'Traditional 401k — make the most of it',body:'Focus on capturing the full match and contributing consistently. When your situation allows, open a Roth IRA.<br><br>The most important thing is that you\'re investing at all.',tip:"Don't let perfect be the enemy of good. A Traditional 401k beats no retirement account."}};
+let rH=[],rC='start';
+function renderRoth(){
+  const node=rN[rC],pct=Math.min((rH.length/4)*100,90);
+  $('r-prog').style.width=pct+'%';
+  let h='';
+  if(rH.length>0)h+=`<div class="crumb-row">${rH.map(x=>`<span class="crumb">${x}</span>`).join('<span style="color:var(--text-3);font-size:11px;margin:0 2px">›</span>')}</div>`;
+  if(node.result){
+    const cls={roth:'result-roth',trad:'result-trad',both:'result-both',split:'result-split'}[node.type];
+    h+=`<div class="result-card ${cls}"><div class="result-title">${node.title}</div><div class="result-body">${node.body}</div></div><div class="insight insight-blue"><strong>Key insight:</strong> ${node.tip}</div><button class="reset-btn" onclick="resetRoth()">↺ Start over</button>`;
+  } else {
+    h+=`<div class="q-card"><div class="q-text">${node.q}</div><div class="q-sub">${node.sub}</div><div class="btn-row">${node.opts.map((o,i)=>`<button class="opt-btn" onclick="pickRoth(${i})">${o.l}</button>`).join('')}</div></div>`;
+  }
+  $('r-app').innerHTML=h;
+}
+function pickRoth(i){const o=rN[rC].opts[i];rH.push(o.l);rC=o.n;renderRoth();}
+function resetRoth(){rH=[];rC='start';renderRoth();}
+
+/* ── M5: COAST FIRE ── */
+function updateCF(){
+  const age=+$('cf-age').value,ret=+$('cf-ret').value,saved=+$('cf-saved').value,mo=+$('cf-mo').value,inc=+$('cf-inc').value,rate=+$('cf-rate').value;
+  $('cf-age-v').textContent=age;$('cf-ret-v').textContent=ret;$('cf-saved-v').textContent=fmt(saved);$('cf-mo-v').textContent=fmt(mo);$('cf-inc-v').textContent='$'+inc.toLocaleString();$('cf-rate-v').textContent=rate.toFixed(1)+'%';
+  const yL=Math.max(ret-age,1),fireNum=inc/0.04,coastNow=fireNum/Math.pow(1+rate/100,yL),coasted=saved>=coastNow;
+  let coastAge=null,bal=saved;
+  for(let y=0;y<=yL;y++){const cn=fireNum/Math.pow(1+rate/100,Math.max(yL-y,.01));if(bal>=cn){coastAge=age+y;break;}bal=fv(bal,mo,rate,1);}
+  const balRet=fv(saved,mo,rate,yL),onTrack=balRet>=fireNum;
+  $('cf-metrics').innerHTML=`<div class="metric-card"><div class="metric-label">FIRE number (25× spending)</div><div class="metric-value" style="color:var(--purple)">${fmt(fireNum)}</div><div class="metric-sub">in today's dollars</div></div><div class="metric-card"><div class="metric-label">Coast number today</div><div class="metric-value" style="color:${coasted?'var(--green)':'var(--red)'}">${fmt(coastNow)}</div><div class="metric-sub">${coasted?'✓ already there':fmt(coastNow-saved)+' to go'}</div></div><div class="metric-card"><div class="metric-label">Current savings</div><div class="metric-value">${fmt(saved)}</div><div class="metric-sub">${coasted?'✓ coasted':'keep going'}</div></div><div class="metric-card"><div class="metric-label">Projected at retirement</div><div class="metric-value" style="color:${onTrack?'var(--green)':'var(--red)'}">${fmt(balRet)}</div><div class="metric-sub">${onTrack?'✓ on track':fmt(Math.abs(balRet-fireNum))+' short'}</div></div>`;
+  $('cf-status').innerHTML=coasted?`<div class="banner banner-green">🎉 <strong>You've already reached Coast FIRE.</strong> Your savings will grow to ${fmt(fireNum)} by age ${ret} without another dollar invested.</div>`:coastAge?`<div class="banner banner-amber">At your current rate you'll reach Coast FIRE at age <strong>${coastAge}</strong> — <strong>${coastAge-age} years from now.</strong> After that, contributions are optional.</div>`:`<div class="banner banner-amber">At this rate, Coast FIRE won't be reached before retirement. Try increasing contributions or adjusting your target income.</div>`;
+  $('cf-insight').innerHTML=coasted?`Your money is working harder than you are. Every additional dollar now accelerates your retirement date or increases income.`:coastAge?`You need <strong>${fmt(Math.max(coastNow-saved,0))}</strong> more. At <strong>${fmt(mo)}/month</strong>, that's roughly <strong>${Math.round((coastAge-age)*12)} months</strong> away.`:`Increase monthly contributions or lower retirement spending target to reach Coast FIRE.`;
+  const sp=Math.max(ret-age,1),cs=coastAge?Math.max(coastAge-age,0):sp,sPct=Math.min((cs/sp)*100,100),cPct=100-sPct;
+  $('cf-tl').innerHTML=`<div class="tl-seg" style="width:${sPct}%;background:#9B91E8;color:#fff">${sPct>15?'Saving'+(coastAge?' → '+coastAge:''):''}</div><div class="tl-seg" style="width:${cPct}%;background:var(--green);color:#fff">${cPct>10?'Coasting →':''}</div>`;
+  $('cf-tl-labels').innerHTML=`<span>Age ${age}</span>${coastAge&&coastAge<ret?`<span>Coast at ${coastAge}</span>`:''}<span>Retire at ${ret}</span>`;
+}
+
+/* ── M6: SURVIVORSHIP ── */
+const stocks=[
+  {name:'NVDA',type:'winner',label:'NVDA'},{name:'AAPL',type:'winner',label:'AAPL'},{name:'MSFT',type:'winner',label:'MSFT'},
+  {name:'AMZN',type:'winner',label:'AMZN'},{name:'META',type:'winner',label:'META'},{name:'TSLA',type:'winner',label:'TSLA'},
+  {name:'GOOGL',type:'winner',label:'GOOG'},{name:'AVGO',type:'winner',label:'AVGO'},
+  {name:'IBM',type:'loser',label:''},{name:'GE',type:'loser',label:''},{name:'WBA',type:'loser',label:''},{name:'VNO',type:'loser',label:''},
+  {name:'PFE',type:'loser',label:''},{name:'PARA',type:'loser',label:''},{name:'WBD',type:'loser',label:''},{name:'INTC',type:'loser',label:''},
+  {name:'CVS',type:'loser',label:''},{name:'NWL',type:'loser',label:''},{name:'MO',type:'loser',label:''},{name:'T',type:'loser',label:''},
+  {name:'VZ',type:'loser',label:''},{name:'KHC',type:'loser',label:''},{name:'MMM',type:'loser',label:''},{name:'BA',type:'loser',label:''},
+  {name:'DXC',type:'loser',label:''},{name:'DNB',type:'loser',label:''},{name:'PTON',type:'loser',label:''},{name:'LC',type:'loser',label:''},
+  {name:'OPEN',type:'loser',label:''},{name:'NKLA',type:'loser',label:''},
+  {name:'SVB',type:'dead',label:'SVB'},{name:'FTX',type:'dead',label:'FTX'},{name:'SPCE',type:'dead',label:'SPCE'},
+  {name:'WEWORK',type:'dead',label:'WeWork'},{name:'BBBY',type:'dead',label:'BBBY'},{name:'GOEV',type:'dead',label:''},
+  {name:'AMCX',type:'dead',label:''},{name:'CLOV',type:'dead',label:''},{name:'WISH',type:'dead',label:''},
+  {name:'FAZE',type:'dead',label:''},{name:'MULN',type:'dead',label:''},{name:'MVST',type:'dead',label:''},
+  {name:'RIVN',type:'dead',label:''},{name:'LCID',type:'dead',label:''},{name:'FFIE',type:'dead',label:''},
+  {name:'BKKT',type:'dead',label:''},{name:'MARK',type:'dead',label:''},{name:'NNDM',type:'dead',label:''},
+  {name:'ATXI',type:'dead',label:''},{name:'ATER',type:'dead',label:''},{name:'GFAI',type:'dead',label:''},
+  {name:'LIQT',type:'dead',label:''},{name:'DOGZ',type:'dead',label:''},{name:'HCDI',type:'dead',label:''},
+  {name:'OPAD',type:'dead',label:''},{name:'CPRI',type:'dead',label:''},{name:'BGFV',type:'dead',label:''},
+  {name:'EZFL',type:'dead',label:''},{name:'FORG',type:'dead',label:''},{name:'PRTY',type:'dead',label:''},
+  {name:'WISH2',type:'dead',label:''},{name:'BLNK',type:'dead',label:''},{name:'RIDE',type:'dead',label:''},
+  {name:'GOEV2',type:'dead',label:''},{name:'NKLA2',type:'dead',label:''},{name:'BBBY2',type:'dead',label:''},
+  {name:'OPEN2',type:'dead',label:''},{name:'CLOV2',type:'dead',label:''},{name:'SPCE2',type:'dead',label:''},
+  {name:'MVST2',type:'dead',label:''},{name:'FAZE2',type:'dead',label:''},{name:'MULN2',type:'dead',label:''}
+];
+for(let i=stocks.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[stocks[i],stocks[j]]=[stocks[j],stocks[i]];}
+let revealed=false;
+function buildGrid(){
+  const grid=$('surv-grid');grid.innerHTML='';
+  stocks.slice(0,100).forEach(s=>{
+    const cell=document.createElement('div');
+    cell.className='surv-cell '+s.type;cell.title=s.name;
+    cell.style.cssText='background:#F3F1EC;border:1px solid var(--border);color:transparent;';
+    grid.appendChild(cell);
+  });
+}
+buildGrid();
+function revealSurv(){
+  if(revealed)return;revealed=true;
+  const cells=document.querySelectorAll('.surv-cell');
+  cells.forEach((cell,i)=>{
+    setTimeout(()=>{
+      cell.style.cssText='';
+      const s=stocks[i];
+      if(s&&s.type==='winner')cell.textContent=s.label||'';
+    },i*18);
+  });
+  const w=stocks.slice(0,100).filter(s=>s.type==='winner').length,d=stocks.slice(0,100).filter(s=>s.type==='dead').length;
+  setTimeout(()=>{
+    const rev=$('surv-reveal');rev.style.display='block';
+    rev.innerHTML=`Out of 100 stocks: <strong>${w} big winners</strong> (green) — the ones everyone talks about. <strong>${d} major losers or near-zero</strong> (red) — never mentioned. The index fund captured all the winners automatically. You had to guess which ${w} in advance.`;
+    $('surv-btn').style.display='none';
+  },100*18+300);
+}
+
+/* ── M6: 90/10 ── */
+let ntChart=null;
+function updateNT(){
+  const mo=+$('nt-mo').value,yrs=+$('nt-yrs').value,funRate=+$('nt-fun').value;
+  $('nt-mo-v').textContent='$'+mo.toLocaleString();$('nt-yrs-v').textContent=yrs+' years';$('nt-fun-v').textContent=(funRate>=0?'+':'')+funRate+'%';
+  const indexRate=7,boringMo=mo*.9,funMo=mo*.1;
+  $('mo-bar').innerHTML=`<div class="mo-seg" style="width:90%;background:var(--green);color:#fff">$${Math.round(boringMo)}/mo → index funds (90%)</div><div class="mo-seg" style="width:10%;background:var(--amber);color:#fff;font-size:10px">$${Math.round(funMo)}</div>`;
+  const boringEnd=fv(0,boringMo,indexRate,yrs),funEnd=fv(0,funMo,funRate,yrs),totalEnd=boringEnd+Math.max(funEnd,0),allIndexEnd=fv(0,mo,indexRate,yrs),allStockEnd=Math.max(fv(0,mo,funRate,yrs),0);
+  $('nt-cards').innerHTML=`<div class="bucket bucket-boring"><div class="bucket-title">🟢 Index slice (90% of deposits)</div><div class="bucket-val" style="color:var(--green)">${fmt(boringEnd)}</div><div class="bucket-sub">$${Math.round(boringMo)}/mo · ${indexRate}%/yr · ${yrs} yrs</div></div><div class="bucket bucket-fun"><div class="bucket-title">🟡 Picks slice (10% of deposits)</div><div class="bucket-val" style="color:${Math.max(funEnd,0)>0?'var(--amber)':'var(--red)'}">${fmt(Math.max(funEnd,0))}</div><div class="bucket-sub">$${Math.round(funMo)}/mo · ${funRate>=0?'+':''}${funRate}%/yr · ${yrs} yrs</div></div>`;
+  $('nt-insight').innerHTML=funRate>=indexRate?`Your picks beat the index at ${funRate}%/yr — total: <strong>${fmt(totalEnd)}</strong> vs all-index <strong>${fmt(allIndexEnd)}</strong>. Your 10% slice added <strong>${fmt(totalEnd-allIndexEnd)}</strong> in extra value.`:funRate<0?`Your picks lost money at ${funRate}%/yr — but the 90% index slice compounded to <strong>${fmt(boringEnd)}</strong>. The foundation held. All-in stock picking would have left you with <strong>${fmt(allStockEnd)}</strong>.`:`Your picks returned ${funRate}%/yr — below the index. Total: <strong>${fmt(totalEnd)}</strong> vs all-index <strong>${fmt(allIndexEnd)}</strong>. Cost of the active 10% slice: <strong>${fmt(allIndexEnd-totalEnd)}</strong>. Foundation intact.`;
+  const labels=[],dNT=[],dAll=[],dIdx=[];
+  for(let y=0;y<=yrs;y++){labels.push(y);const b=fv(0,boringMo,indexRate,y),f=fv(0,funMo,funRate,y);dNT.push(Math.round(b+Math.max(f,0)));dAll.push(Math.max(Math.round(fv(0,mo,funRate,y)),0));dIdx.push(Math.round(fv(0,mo,indexRate,y)));}
+  const gc='rgba(0,0,0,0.05)',tc='rgba(0,0,0,0.4)';
+  if(ntChart){ntChart.data.labels=labels;ntChart.data.datasets[0].data=dNT;ntChart.data.datasets[1].data=dAll;ntChart.data.datasets[2].data=dIdx;ntChart.update('none');}
+  else ntChart=new Chart($('nt-chart'),{type:'line',data:{labels,datasets:[{data:dNT,borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.07)',fill:true,tension:0.4,pointRadius:0,borderWidth:2.5},{data:dAll,borderColor:'#C97B1A',fill:false,tension:0.4,pointRadius:0,borderWidth:2,borderDash:[6,4]},{data:dIdx,borderColor:'#2563A8',fill:false,tension:0.4,pointRadius:0,borderWidth:1.5,borderDash:[3,3]}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}},scales:{x:{title:{display:true,text:'Years',color:tc,font:{size:11}},ticks:{color:tc,font:{size:11},maxTicksLimit:8},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1e3).toFixed(0)+'K'},grid:{color:gc}}}}});
+}
+
+/* ── M6: ALLOC & TD ── */
+function showInvestTab(id,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  $('itab-'+id).classList.add('active');btn.classList.add('active');
+}
+function updateAl(){
+  const age=+$('al-age').value,risk=+$('al-risk').value;
+  $('al-age-v').textContent=age;$('al-risk-v').textContent=['','Conservative','Moderate','Aggressive'][risk];
+  let stk=110-age;if(risk===1)stk-=10;if(risk===3)stk+=10;stk=Math.min(Math.max(stk,30),100);
+  if(age<30)stk=100;
+  const bnd=100-stk,intl=Math.round(stk*.20),us=stk-intl;
+  $('al-bar').innerHTML=`<div class="alloc-seg" style="width:${us}%;background:#1A7A5E;color:#fff">${us>10?us+'% US':''}</div><div class="alloc-seg" style="width:${intl}%;background:#2EA87A;color:#fff">${intl>8?intl+'% Intl':''}</div>${bnd>0?`<div class="alloc-seg" style="width:${bnd}%;background:#C97B1A;color:#fff">${bnd>8?bnd+'% Bonds':''}</div>`:''}`;
+  $('al-labels').innerHTML=bnd>0?`<span>← Stocks (${stk}%)</span><span>Bonds (${bnd}%) →</span>`:`<span>← 100% stocks — no bonds needed in your 20s →</span>`;
+  $('al-metrics').innerHTML=`<div class="metric-card"><div class="metric-label">US stocks</div><div class="metric-value" style="color:var(--green)">${us}%</div><div class="metric-sub">FZROX or VTI</div></div><div class="metric-card"><div class="metric-label">International</div><div class="metric-value" style="color:#2EA87A">${intl}%</div><div class="metric-sub">FZILX or VXUS</div></div>${bnd>0?`<div class="metric-card"><div class="metric-label">Bonds</div><div class="metric-value" style="color:var(--amber)">${bnd}%</div><div class="metric-sub">BND or FXNAX</div></div>`:''}`;
+  const bondNote=age<30?'In your 20s, skip bonds entirely — a 40-year runway is better protection than any bond allocation. Add them when you\'re within 15–20 years of retirement.':age<40?'Minimal bonds make sense as a cushion, but time is still strongly on your side.':'As you approach retirement, shifting more toward bonds reduces the risk of a crash right when you need to draw down.';
+  $('al-insight').innerHTML=`At age ${age}: <strong>${stk}% stocks${bnd>0?', '+bnd+'% bonds':' — no bonds yet'}</strong>. ${bondNote}`;
+  const bondRow=bnd>0?`<tr><td style="padding:10px 0"><strong>BND or FXNAX</strong><br><span style="font-size:11px;color:var(--text-3)">Total bond market</span></td><td style="text-align:right;padding:10px 0;font-weight:600">${bnd}%</td></tr>`:'';
+  $('al-funds').innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px;"><thead><tr><th style="text-align:left;padding:8px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);border-bottom:2px solid var(--border)">Fund</th><th style="text-align:right;padding:8px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);border-bottom:2px solid var(--border)">Allocation</th></tr></thead><tbody><tr><td style="padding:10px 0;border-bottom:1px solid var(--border)"><strong>FZROX</strong> (Fidelity) or <strong>VTI</strong> (Vanguard/Schwab)<br><span style="font-size:11px;color:var(--text-3)">Total US stock market · 0% / 0.03% ER</span></td><td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--border);font-weight:600">${us}%</td></tr><tr><td style="padding:10px 0;border-bottom:${bnd>0?'1px solid var(--border)':'none'}"><strong>FZILX</strong> (Fidelity) or <strong>VXUS</strong> (Vanguard/Schwab)<br><span style="font-size:11px;color:var(--text-3)">International stocks · 0% / 0.05% ER</span></td><td style="text-align:right;padding:10px 0;border-bottom:${bnd>0?'1px solid var(--border)':'none'};font-weight:600">${intl}%</td></tr>${bondRow}</tbody></table><div style="font-size:12px;color:var(--text-3)">Rebalance once a year — sell a little of what grew most, buy what lagged, to get back to target percentages.</div>`;
+}
+function updateTD(){}
+
+/* ── M7: JOB CHANGE ── */
+function showJCTab(id,btn){
+  document.querySelectorAll('#mod-jobchange .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#mod-jobchange .tab-panel').forEach(p=>p.classList.remove('active'));
+  $('jctab-'+id).classList.add('active');btn.classList.add('active');
+}
+
+// 401k rollover wizard
+const jcN={
+  start:{q:"What's your situation with the old 401k?",sub:"This determines your timeline and options.",opts:[{l:"Just left or about to leave",n:"bal"},{l:"Left months ago, still sitting there",n:"old"},{l:"Planning ahead, haven't left yet",n:"bal"}]},
+  bal:{q:"Roughly how much is in the old 401k?",sub:"Balances under $5,000 may be force-distributed by the old plan — you need to act first.",opts:[{l:"Under $1,000",n:"small"},{l:"$1,000 – $5,000",n:"medium"},{l:"Over $5,000",n:"big"}]},
+  old:{q:"Has it been over 60 days since you received any distribution?",sub:"The 60-day rollover window starts from the date a check is issued to you.",opts:[{l:"No — still in the old plan, no check issued",n:"bal"},{l:"They sent me a check and I haven't deposited it",n:"check"},{l:"Not sure",n:"bal"}]},
+  small:{result:true,type:'amber',title:'Open an IRA before they mail you a check',body:'Balances under $1,000 may be auto-cashed-out. Open a Traditional IRA at Fidelity or Vanguard <em>now</em>, then call the old plan and request a direct rollover to that IRA.<br><br><strong>Action steps:</strong><br>1. Open Traditional IRA at Fidelity (10 min at fidelity.com)<br>2. Call old 401k plan administrator (number on your statements)<br>3. Request direct rollover — give them the IRA account number<br>4. Allow 2–3 weeks for transfer',tip:"Direct rollover = plan mails the check to Fidelity, not to you. No taxes withheld, no 60-day clock."},
+  medium:{q:"Does your new employer have a 401k?",sub:"$1,000–$5,000 balances can go to either a new 401k or an IRA.",opts:[{l:"Yes, I'm enrolled or will be soon",n:"r401k"},{l:"New job has no 401k / waiting period",n:"rira"},{l:"Self-employed / no new employer",n:"rira"}]},
+  big:{q:"Does your new employer's 401k have good index funds?",sub:"Look for funds with expense ratios under 0.20% — ask HR for the fund lineup or check the plan's website.",opts:[{l:"Yes — low-cost index funds available",n:"r401k"},{l:"Limited options or high fees",n:"rira"},{l:"Not sure yet",n:"rira"}]},
+  r401k:{result:true,type:'green',title:'Roll to your new employer 401k',body:'Simplest option when the new plan has good funds. One account, easier to track, loan access if ever needed, and strong creditor protection.<br><br><strong>Steps:</strong><br>1. Confirm new 401k accepts incoming rollovers (call HR or the plan provider)<br>2. Call old 401k plan, request a <strong>direct rollover</strong> to the new plan<br>3. New plan gives you a mailing address or wire instructions<br>4. Takes 2–4 weeks — follow up if it stalls<br><br><span style="color:var(--red)">⚠ Never request a check made out to yourself</span> — causes mandatory 20% withholding you must make up out of pocket.',tip:"Direct rollover (plan-to-plan): zero taxes, zero penalties, no deadline pressure. Always insist on this method."},
+  rira:{result:true,type:'blue',title:'Roll to a Traditional IRA',body:'More investment options, lower fees, full control — best when the new 401k has poor funds or you have no new employer plan yet.<br><br><strong>Steps:</strong><br>1. Open a Traditional IRA at Fidelity or Vanguard (fidelity.com or vanguard.com)<br>2. Call old plan, request a direct rollover to the IRA<br>3. Once transferred, invest in FZROX + FZILX (Fidelity) or VTI + VXUS (Vanguard/Schwab)<br><br><strong>Note on Backdoor Roth:</strong> Rolling old 401k money into a Traditional IRA creates a pro-rata problem if you plan to do Backdoor Roth conversions. If that applies to you, roll to the new employer 401k instead.',tip:"Roth 401k money → Roth IRA (tax-free). Traditional 401k money → Traditional IRA (tax-free). Never mix account types on a rollover."},
+  check:{result:true,type:'red',title:'60-day clock is running — act now',body:'When the old employer issues you a check, they withhold <strong>20% for taxes automatically</strong>. You now have 60 days to deposit the <em>full original balance</em> — including the withheld 20% from your own pocket — into an IRA or 401k to complete the rollover.<br><br><strong>Example:</strong> $20,000 balance → $16,000 check + $4,000 withheld. To avoid taxes and the 10% penalty, you must deposit $20,000 total. The $4,000 comes back to you at tax time, but you need the cash <em>now</em>.<br><br>If you miss the 60-day window, the full amount is taxable income plus a 10% penalty.',tip:"This is why you should always request a direct rollover. If you already have the check, open an IRA today and deposit immediately."}
+};
+let jcH=[],jcC='start';
+function renderJC(){
+  const node=jcN[jcC],pct=Math.min((jcH.length/3)*100,90);
+  $('jc-prog').style.width=pct+'%';
+  let h='';
+  if(jcH.length>0)h+=`<div class="crumb-row">${jcH.map(x=>`<span class="crumb">${x}</span>`).join('<span style="color:var(--text-3);font-size:11px;margin:0 2px">›</span>')}</div>`;
+  if(node.result){
+    const bg={green:'result-roth',blue:'result-trad',amber:'result-split',red:'result-card'};
+    const bc={green:'var(--green)',blue:'var(--blue)',amber:'var(--amber)',red:'var(--red)'};
+    h+=`<div class="result-card ${bg[node.type]||''}" style="${node.type==='red'?'background:var(--red-light);border:1.5px solid var(--red);':''}"><div class="result-title" style="color:${bc[node.type]}">${node.title}</div><div class="result-body">${node.body}</div></div><div class="insight insight-blue"><strong>Key rule:</strong> ${node.tip}</div><button class="reset-btn" onclick="resetJC()">↺ Start over</button>`;
+  } else {
+    h+=`<div class="q-card"><div class="q-text">${node.q}</div><div class="q-sub">${node.sub}</div><div class="btn-row">${node.opts.map((o,i)=>`<button class="opt-btn" onclick="pickJC(${i})">${o.l}</button>`).join('')}</div></div>`;
+  }
+  $('jc-app').innerHTML=h;
+}
+function pickJC(i){const o=jcN[jcC].opts[i];jcH.push(o.l);jcC=o.n;renderJC();}
+function resetJC(){jcH=[];jcC='start';renderJC();}
+
+// Vesting calculator
+function updateVest(){
+  const bal=+$('v-bal').value,mo=+$('v-mo').value,sal=+$('v-sal').value;
+  $('v-bal-v').textContent='$'+bal.toLocaleString();$('v-mo-v').textContent=mo+' mo';$('v-sal-v').textContent='$'+sal.toLocaleString();
+  const perMo=mo>0?Math.round(bal/mo):bal,pct=sal>0?((bal/sal)*100).toFixed(1):0;
+  $('v-metrics').innerHTML=`<div class="metric-card"><div class="metric-label">Forfeit if you leave now</div><div class="metric-value" style="color:var(--red)">$${bal.toLocaleString()}</div><div class="metric-sub">${pct}% of one month's salary</div></div><div class="metric-card"><div class="metric-label">Value of staying each month</div><div class="metric-value" style="color:var(--green)">$${perMo.toLocaleString()}/mo</div><div class="metric-sub">effective bonus for staying</div></div>`;
+  const worth=perMo>1000?`Each month you stay is worth <strong>$${perMo.toLocaleString()}</strong> in vesting — more than most side gigs pay. If your new employer can wait <strong>${mo} months</strong>, the math strongly favors staying. <br><br><strong>Can't delay?</strong> Your unvested $${bal.toLocaleString()} is a negotiating chip — ask your new employer to cover it in a sign-on bonus. This is standard practice; most employers expect it.`:perMo>300?`At <strong>$${perMo.toLocaleString()}/month</strong>, staying to vest is meaningful money. Ask your new employer if the start date is flexible — most will accommodate 30–60 extra days. If they can't wait, counter with a sign-on bonus equal to the unvested amount ($${bal.toLocaleString()}) — a common and accepted negotiation.`:`The unvested amount is relatively small. If the new opportunity is significantly better, it's likely not worth delaying your start date. You can still mention the forfeited amount when negotiating your sign-on bonus.`;
+  $('v-insight').innerHTML=worth;
+}
+
+// COBRA vs marketplace
+function updateCobra(){
+  const cobra=+$('cob-cobra').value,mkt=+$('cob-mkt').value,gap=+$('cob-gap').value;
+  $('cob-cobra-v').textContent='$'+cobra.toLocaleString();$('cob-mkt-v').textContent='$'+mkt.toLocaleString();$('cob-gap-v').textContent=gap+' mo';
+  const cobraTotal=cobra*gap,mktTotal=mkt*gap,save=cobraTotal-mktTotal;
+  $('cob-metrics').innerHTML=`<div class="metric-card"><div class="metric-label">COBRA total cost</div><div class="metric-value" style="color:var(--red)">$${cobraTotal.toLocaleString()}</div><div class="metric-sub">${gap} mo × $${cobra}/mo</div></div><div class="metric-card"><div class="metric-label">Marketplace total</div><div class="metric-value" style="color:var(--green)">$${mktTotal.toLocaleString()}</div><div class="metric-sub">${gap} mo × $${mkt}/mo</div></div>`;
+  $('cob-insight').innerHTML=save>0?`Marketplace saves <strong>$${save.toLocaleString()}</strong> over this gap. That's real money — unless you have scheduled procedures or ongoing care that make continuity worth the premium.`:`COBRA is actually the lower cost here — which can happen if your employer had an unusually good group rate. Verify your marketplace estimate at healthcare.gov before deciding.`;
+}
+
+// Job change checklist
+const jcSteps=[
+  {phase:'Before your last day',clr:'#C94040',bg:'#FDEAEA',items:[
+    {title:'Calculate your unvested balance',sub:'Check vesting schedule before setting your last day — cliff dates are often monthly or quarterly',det:'Ask HR for your vesting schedule. If you\'re 2 weeks from a cliff, ask your new employer to delay the start date. Most will accommodate a few weeks.<br><br><strong>Also check:</strong> annual bonus payment date, profit-sharing, and RSU grant schedules.',why:'Leaving one week before a vesting cliff is the most common and most expensive job-change mistake.'},
+    {title:'Spend your FSA balance',sub:'Flexible Spending Accounts are use-it-or-lose-it — they don\'t transfer',det:'Schedule any remaining dental, vision, prescriptions, or medical procedures before your last day. FSA money not spent is gone.<br><br><strong>HSA is different:</strong> Your HSA is your money forever. It travels with you regardless of employer.',why:'FSA forfeitures are the most avoidable money loss in a job change — takes 20 minutes to schedule appointments.'},
+    {title:'Download all your documents',sub:'Pay stubs, W-2s, benefits statements, 401k statements',det:'Once you lose access to the HR portal you often can\'t get these back quickly. Download: last 3 years of pay stubs, W-2s, 401k balance and fund statements, benefits summary, vesting schedule, stock option grant agreements.',why:'You\'ll need this for taxes, loan applications, and verifying the 401k rollover completed correctly.'},
+    {title:'Note your 401k plan administrator',sub:'You\'ll need to call them — not your old employer — to initiate the rollover',det:'The 401k is managed by a third party (Fidelity, Vanguard, Principal, Empower, etc.) — not HR. Find the plan name and administrator phone number on your statements. Your old employer cannot initiate the rollover for you.',why:'Many people wait months to roll over because they don\'t know who to call.'},
+  ]},
+  {phase:'Days 1–30 at new job',clr:'#1A7A5E',bg:'#E6F4EF',items:[
+    {title:'Enroll in the new 401k on day 1',sub:'Don\'t wait — some plans have 30-90 day waiting periods where you can\'t contribute',det:'Even if there\'s a waiting period, get on the enrollment list immediately. Confirm if there\'s an employer match and what percentage you need to contribute to capture it.<br><br>Set your contribution to at least the match threshold on day 1. You can increase it later.',why:'Every pay period you delay is a contribution you can\'t get back — and potentially a missed match.'},
+    {title:'Roll over your old 401k within 60 days',sub:'Use the direct rollover method — never take a check made out to yourself',det:'Call your old 401k administrator, tell them you want a <strong>direct rollover</strong> to your new plan or an IRA. They will mail or wire the funds directly — no taxes withheld, no deadline pressure.<br><br>If they issue a check to you: 20% is withheld and you have 60 days to deposit the full amount (including the withheld portion from your own pocket).',why:'Use the wizard in the 401k tab to decide where to send it.'},
+    {title:'Elect health coverage',sub:'Open enrollment window at new employer is often 30 days — check immediately',det:'New employer coverage often starts on your first day or the first of the next month. If there\'s a waiting period, you need COBRA or marketplace to bridge the gap.<br><br>Compare plans: HDHP + HSA can save thousands if you\'re healthy. Check whether your doctors are in-network.',why:'Miss the enrollment window and you may be locked out until the next open enrollment period — potentially 11 months.'},
+    {title:'Update beneficiaries everywhere',sub:'Old employer 401k, IRA, life insurance — beneficiaries override your will',det:'Beneficiary designations on retirement accounts and life insurance override whatever your will says. Update them at the new employer\'s plan, any IRAs you have, and life insurance policies.<br><br>Common mistake: beneficiary is still an ex-partner or deceased parent from a form filled out years ago.',why:'Retirement accounts pass by beneficiary designation, not by will. Outdated beneficiaries are a major estate planning failure point.'},
+  ]}
+];
+function renderJCLadder(){
+  let h='';
+  jcSteps.forEach(section=>{
+    h+=`<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin:20px 0 8px">${section.phase}</div>`;
+    section.items.forEach((s,i)=>{
+      const id='jcl-'+section.phase.replace(/\s/g,'')+i;
+      h+=`${i>0?'<div class="connector"></div>':''}<div class="step-card" id="sc-${id}" onclick="toggleStep('${id}')"><div class="step-header"><div class="step-num" style="background:${section.bg};color:${section.clr}">${i+1}</div><div style="flex:1"><div class="step-title">${s.title}</div><div class="step-sub">${s.sub}</div></div><span id="sch-${id}" style="color:var(--text-3);font-size:18px;transition:transform .2s">›</span></div><div class="step-detail" id="sd-${id}">${s.det}<div class="why"><strong>Why this matters:</strong> ${s.why}</div></div></div>`;
+    });
+  });
+  $('jc-ladder').innerHTML=h;
+}
+
+/* ── INIT ── */
+updateC();renderLadder();updateP();renderRoth();updateCF();updateNT();updateAl();updateTD();renderJC();renderJCLadder();updateVest();updateCobra();
+</script>
+</body>
+</html>
