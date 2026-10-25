@@ -1,6 +1,6 @@
 # Money Basics
 
-Interactive personal-finance lessons for young adults starting their careers: three paths, compounding, which account to fund first, paycheck math, Roth vs Traditional, Coast FIRE, what to invest in, and changing jobs.
+Interactive personal-finance lessons for young adults starting their careers: a personal step-by-step plan (My Plan), three paths, compounding, which account to fund first, paycheck math, Roth vs Traditional, Coast FIRE, what to invest in, and changing jobs.
 
 Live: https://money-basics-app.vercel.app (deploys automatically from `main` via Vercel)
 
