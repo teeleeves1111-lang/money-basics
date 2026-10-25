@@ -383,13 +383,14 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
         <label class="mp-field" id="mp-w-ptype">Plan type<select id="mp-ptype"><option value="401k">401(k)</option><option value="403b">403(b)</option><option value="simple">SIMPLE IRA</option></select></label>
       </div>
       <div class="mp-row" id="mp-w-plan">
-        <label class="mp-field">You put in (% of pay)<input type="number" inputmode="decimal" min="0" max="100" step="0.5" id="mp-pct"></label>
+        <label class="mp-field">You put in<span style="display:flex;gap:6px"><select id="mp-cmode" style="width:auto;flex-shrink:0"><option value="dollars">$ per paycheck</option><option value="percent">% of pay</option></select><span class="mp-money" id="mp-w-camt" style="flex:1"><input type="number" inputmode="decimal" min="0" id="mp-camt" placeholder="from your pay stub"></span><input type="number" inputmode="decimal" min="0" max="100" step="0.5" id="mp-pct" placeholder="%" style="flex:1;display:none"></span><small>Your pay stub lists it as a dollar amount each payday. 0 if you're not signed up.</small></label>
         <label class="mp-field">Employer match<select id="mp-match">
           <option value="unsure">Not sure</option><option value="none">No match</option>
           <option value="50-6">50% of the first 6% you put in</option><option value="100-3">100% of the first 3%</option>
           <option value="100-4">100% of the first 4%</option><option value="100-6">100% of the first 6%</option>
           <option value="custom">Something else</option></select></label>
       </div>
+      <div class="insight insight-blue" id="mp-plan-hint" style="display:none;margin-top:-2px"></div>
       <div class="mp-row" id="mp-w-custom" style="display:none">
         <label class="mp-field">They match (% of what you put in)<input type="number" inputmode="decimal" min="0" max="200" id="mp-mpct"></label>
         <label class="mp-field">Up to (% of your pay)<input type="number" inputmode="decimal" min="0" max="25" step="0.5" id="mp-mupto"></label>
@@ -1561,7 +1562,7 @@ function renderJCLadder(){
    MY PLAN — personal step-by-step plan (adapted from Next Step)
    ══════════════════════════════════════════════════════════════ */
 const MP_KEY='moneybasics-plan-v1';
-const MP_FIELDS=['age','filing','state','student','paymode','freq','salary','hourly','hours','takehome','plan','ptype','pct','match','mpct','mupto','roth','hsa','rent','car','other','cash','rbal'];
+const MP_FIELDS=['age','filing','state','student','paymode','freq','salary','hourly','hours','takehome','plan','ptype','cmode','camt','pct','match','mpct','mupto','roth','hsa','rent','car','other','cash','rbal'];
 const MP_DEBT_TYPES={card:'Credit card',bnpl:'Buy now, pay later',personal:'Personal loan',car:'Car loan',fedstudent:'Federal student loan',privstudent:'Private student loan',medical:'Medical bill',other:'Other'};
 const MP_BUCKETS=[['car','Car repairs, registration, tickets','Even without a car: bike or transit card replacement'],['gifts','Holidays and gifts','Birthdays, weddings, December'],['travel','Trips home and vacations','Flights, weekends away'],['tech','Phone, laptop and other gear','Spread the next one over 2–3 years'],['yearly','Yearly bills','Renter\'s insurance, subscriptions, memberships'],['medical','Doctor, dentist and glasses','Copays and deductibles']];
 const MP_STEP_TITLES={number:'Know your number',cushion:'Starter cushion',match:'Get the full match',debt:'Pay off expensive debt',emergency:'Three months of savings',roth:'Open a Roth IRA',retire:'Save 15% for retirement',goals:'Pick your next goal'};
@@ -1570,8 +1571,8 @@ const mpEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 let mp=mpBlank();
 let mpView_='form';
 
-function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50};}
-function mpLoad(){try{const r=localStorage.getItem(MP_KEY);if(r){const o=JSON.parse(r);mp=Object.assign(mpBlank(),o);return true;}}catch(e){}return false;}
+function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',cmode:'dollars',camt:'',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50};}
+function mpLoad(){try{const r=localStorage.getItem(MP_KEY);if(r){const o=JSON.parse(r);if(o.cmode===undefined&&o.pct)o.cmode='percent';mp=Object.assign(mpBlank(),o);return true;}}catch(e){}return false;}
 function mpSave(){try{localStorage.setItem(MP_KEY,JSON.stringify(mp));}catch(e){}}
 
 function mpFill(){
@@ -1591,6 +1592,22 @@ function mpToggles(){
   $('mp-w-plan').style.display=hasPlan?'grid':'none';
   $('mp-w-ptype').style.visibility=hasPlan?'visible':'hidden';
   $('mp-w-custom').style.display=hasPlan&&$('mp-match').value==='custom'?'grid':'none';
+  const dollars=$('mp-cmode').value==='dollars';
+  $('mp-w-camt').style.display=dollars?'block':'none';
+  $('mp-pct').style.display=dollars?'none':'block';
+  mpPlanHint();
+}
+function mpPlanHint(){
+  const el=$('mp-plan-hint');const c=mpCalc(mp);
+  if(mp.plan!=='yes'||!(c.gross>0)){el.style.display='none';return;}
+  const plan=mpPlanName(mp),pp=v=>usd(Math.ceil(v));
+  const lines=[];
+  lines.push(c.perPP>0?`You're putting in <strong>${pp(c.perPP)} a paycheck</strong> — <strong>${usd(c.pre)} a year</strong>, or ${c.pctR}% of your pay.`:`You're not putting anything into your ${plan} yet.`);
+  if(c.t)lines.push(`To get the <strong>full match</strong>: <strong>${pp(c.matchPP)} a paycheck</strong> (${c.t.upto}% of pay). Your employer then adds about ${usd(c.matchFull)} a year.`);
+  lines.push(`To reach the <strong>${Y} maximum</strong> of ${usd(c.lim)}: <strong>${usd(Math.floor(c.maxPP))} a paycheck</strong> (${c.maxPct}% of pay).${mp.ptype==='simple'?` Small employers (25 or fewer people) allow up to ${usd(LIM.simpleSmall)}.`:''}`);
+  if(c.overMax)lines.push(`<span style="color:var(--red)">That's more than the yearly maximum — your plan will stop taking money once you hit ${usd(c.lim)}.</span>`);
+  lines.push(`<span style="font-size:11px">Started this job partway through the year? You can put in more per paycheck and still stay under the max — the Paycheck tab's "Started mid-year" option shows how much.</span>`);
+  el.innerHTML=lines.join('<br>');el.style.display='block';
 }
 function mpChanged(){mpRead();mpToggles();mpSave();mpUpdateCode();}
 function mpRenderDebts(){
@@ -1608,7 +1625,7 @@ function mpRenderBuckets(){
   $('mp-bk').innerHTML=MP_BUCKETS.map(([k,l,h])=>`<div class="mp-row" style="grid-template-columns:1.6fr 1fr;align-items:center;margin-bottom:8px"><div style="font-size:13px;color:var(--text)">${l}<small style="display:block;color:var(--text-3);font-size:11px">${h}</small></div><span class="mp-money"><input type="number" inputmode="decimal" min="0" data-bk="${k}" placeholder="per year" value="${mpEsc((mp.buckets||{})[k]??'')}" style="font-family:inherit;font-size:14px;padding:8px 10px 8px 20px;border:1px solid var(--border);border-radius:8px;width:100%"></span></div>`).join('');
 }
 function mpExample(){
-  mp=Object.assign(mpBlank(),{age:'24',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'68000',plan:'yes',ptype:'401k',pct:'3',match:'50-6',roth:'0',hsa:'unsure',rent:'1650',car:'0',other:'1250',cash:'1400',rbal:'4200',
+  mp=Object.assign(mpBlank(),{age:'24',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'68000',plan:'yes',ptype:'401k',cmode:'dollars',camt:'78',match:'50-6',roth:'0',hsa:'unsure',rent:'1650',car:'0',other:'1250',cash:'1400',rbal:'4200',
     debts:[{type:'card',balance:'3200',rate:'24.9',min:'95'},{type:'fedstudent',balance:'21000',rate:'5.5',min:'230'}],buckets:{gifts:'800',travel:'1500',tech:'400',yearly:'300'}});
   mpFill();mpSave();mpView('plan');
 }
@@ -1662,8 +1679,12 @@ function mpCalc(s){
   const married=s.filing==='married';
   const isSimple=s.ptype==='simple';
   const lim=isSimple?LIM.simple:LIM.k401;
-  const pct=s.plan==='yes'?mpN(s.pct):0;
-  const pre=Math.min(gross*pct/100,lim);
+  const rawPct=s.plan!=='yes'?0:s.cmode==='percent'?mpN(s.pct):(gross>0?mpN(s.camt)*freq/gross*100:0);
+  const overMax=gross*rawPct/100>lim+1;
+  const pre=Math.min(gross*rawPct/100,lim);
+  const pct=gross>0?pre/gross*100:0;
+  const pctR=Math.round(pct*10)/10;
+  const perPP=pre/freq,maxPP=lim/freq,maxPct=gross>0?Math.round(Math.min(lim/gross*100,100)*10)/10:0;
   const taxNoSave=fedTax(gross,married)+stateTax(gross,s.state,married)+ficaCalc(gross);
   const tax=fedTax(gross-pre,married)+stateTax(gross,s.state,married)+ficaCalc(gross);
   const estTake=Math.max(gross-tax-pre,0);
@@ -1678,6 +1699,7 @@ function mpCalc(s){
   const t=terms&&terms!=='unsure'?terms:null;
   const matchNow=t?gross*Math.min(pct,t.upto)/100*t.pct/100:0;
   const matchFull=t?gross*t.upto/100*t.pct/100:0;
+  const matchPP=t?gross*t.upto/100/freq:0;
   const rothYr=Math.min(mpN(s.roth)*12,LIM.ira);
   const totalRate=gross>0?(pre+matchNow+rothYr)/gross*100:0;
   const expensive=debts.filter(d=>mpN(d.rate)>=8).sort((a,b)=>mpN(b.rate)-mpN(a.rate));
@@ -1696,13 +1718,13 @@ function mpCalc(s){
   const saverRate=s.student==='yes'||mpN(s.age)<18?0:agi<=sv[0]?.5:agi<=sv[1]?.2:agi<=sv[2]?.1:0;
   const saverCredit=Math.round(saverRate*Math.min(pre+rothYr,2000));
   const rp=RULES.rothPhaseOut[married?'married':'single'];
-  return{freq,gross,married,isSimple,lim,pct,pre,tax,taxNoSave,estTake,estimated,takeMo,bills,debts,mins,left,terms,t,matchNow,matchFull,rothYr,totalRate,expensive,monthlyNeeds,cushionTarget,efTarget,cash,share,bucketYr,bucketMo,toStep,preSaves,agi,saverRate,saverCredit,rothOver:agi>rp[0]};
+  return{freq,gross,married,isSimple,lim,pct,pctR,perPP,maxPP,maxPct,overMax,matchPP,pre,tax,taxNoSave,estTake,estimated,takeMo,bills,debts,mins,left,terms,t,matchNow,matchFull,rothYr,totalRate,expensive,monthlyNeeds,cushionTarget,efTarget,cash,share,bucketYr,bucketMo,toStep,preSaves,agi,saverRate,saverCredit,rothOver:agi>rp[0]};
 }
 function mpSteps(s,c){
   const st={
     number:c.left>=0?'done':'now',
     cushion:c.cash>=c.cushionTarget?'done':'todo',
-    match:(s.plan==='no'||c.terms===null)?'skip':(c.terms==='unsure'||s.plan==='unsure')?'todo':(c.pct>=c.t.upto?'done':'todo'),
+    match:(s.plan==='no'||c.terms===null)?'skip':(c.terms==='unsure'||s.plan==='unsure')?'todo':(c.perPP>=c.matchPP-1?'done':'todo'),
     debt:c.expensive.length?'todo':'done',
     emergency:c.efTarget>0&&c.cash>=c.efTarget?'done':'todo',
     roth:(c.rothYr>=LIM.ira*0.95||c.totalRate>=15)?'done':'todo',
@@ -1728,11 +1750,11 @@ function mpStepDetail(id,s,c){
   case 'match':{
     if(c.terms==='unsure'||s.plan==='unsure')return{h:'Find out your employer match',why:'Most employers add money when you save for retirement. You can\'t get it if you don\'t know the rule.',
       how:['Log in to your benefits website and open the retirement plan section, or find the plan summary from onboarding.','Or ask HR: "What is the employer match on our retirement plan, and how long until it\'s fully mine (the vesting schedule)?"','Come back to My numbers and choose your match. This plan will tell you exactly what percent to put in.']};
-    const addPct=c.t.upto-c.pct,addYr=c.gross*addPct/100,perCheck=addYr/ppy,afterTax=perCheck*(1-c.preSaves),missed=c.matchFull-c.matchNow;
-    return{h:`Raise your ${plan} to ${c.t.upto}%`,
-      why:`Your employer adds ${c.t.pct}% of what you put in, up to ${c.t.upto}% of your pay. You're at ${c.pct}%, so you're leaving about ${usd(missed)} a year of free money behind.`,
-      money:`Costs about ${usd(afterTax)} a paycheck after tax savings. Your employer adds about ${usd(missed/ppy)} each paycheck on top.`,
-      how:[`Log in to your benefits website, open the retirement plan, and change your contribution to ${c.t.upto}%. Or email HR: "Please change my ${plan} contribution to ${c.t.upto}%."`,
+    const target=Math.ceil(c.matchPP),perCheck=Math.max(0,target-c.perPP),afterTax=perCheck*(1-c.preSaves),missed=c.matchFull-c.matchNow;
+    return{h:`Put ${usd(target)} a paycheck into your ${plan}`,
+      why:`Your employer adds ${c.t.pct}% of what you put in, up to ${c.t.upto}% of your pay — that's the first ${usd(target)} of each paycheck. You're putting in ${usd(Math.ceil(c.perPP))}, so you're leaving about ${usd(missed)} a year of free money behind.`,
+      money:`That's ${usd(perCheck)} more a paycheck, which really costs about ${usd(afterTax)} after the tax you save. Your employer adds about ${usd(missed/ppy)} each paycheck on top.`,
+      how:[`Log in to your benefits website, open the retirement plan, and set your contribution to ${usd(target)} per paycheck. If it asks for a percent instead, enter ${c.t.upto}%. Or email HR: "Please change my ${plan} contribution to ${c.t.upto}% of pay."`,
         s.ptype==='simple'?'SIMPLE IRAs are pre-tax only, so there\'s no Roth choice to make here.':c.preSaves<=0.15?'If your plan offers a Roth option, choose it. At your income, pre-tax saves little now, and Roth money comes out tax-free later.':'Pre-tax saves you real tax now at your income. Either choice works; pre-tax is slightly better.',
         'If it asks you to pick investments, choose the target-date index fund closest to the year you turn 65, or see the What to Buy tab.',
         'Changing jobs within a few years? Do it anyway. You keep everything you put in, and usually part of the match.']};}
@@ -1752,8 +1774,8 @@ function mpStepDetail(id,s,c){
     how:['Open a Roth IRA at Fidelity, Schwab or Vanguard. It takes about 10 minutes online.','Set up an automatic monthly transfer from checking, then make sure the money is invested (not sitting as cash). One target-date index fund, or FZROX + FZILX, is plenty.',`You can fund a year's Roth until April 15 of the next year.`,
       c.rothOver?`At your income the Roth limit starts to shrink (${k(RULES.rothPhaseOut[c.married?'married':'single'][0])}+). Look up the "backdoor Roth" before contributing.`:'You can take out what you put in (not the growth) without penalty, so it doubles as a last-resort cushion.']};}
   case 'retire':{return{h:'Save 15% for retirement',
-    why:`Counting your employer match and Roth IRA, you're saving about ${Math.round(c.totalRate*10)/10}% of your pay. 15% in total from your 20s puts you on a strong path — see the Three Paths tab.`,
-    money:c.gross>0?`Raising your ${s.plan==='yes'?plan:'savings'} by 1% costs about ${usd(c.gross*.01/ppy*(1-c.preSaves))} a paycheck after tax.`:null,
+    why:`Counting your employer match and Roth IRA, you're saving about ${usd((c.pre+c.matchNow+c.rothYr)/12)} a month — ${Math.round(c.totalRate*10)/10}% of your pay. 15% in total from your 20s puts you on a strong path — see the Three Paths tab.`,
+    money:c.gross>0?(s.plan==='yes'?`You put in ${usd(Math.ceil(c.perPP))} a paycheck now. Every extra ${usd(Math.ceil(c.gross*.01/ppy))} a paycheck adds 1% of your pay, and really costs about ${usd(c.gross*.01/ppy*(1-c.preSaves))} after tax. The most you can put in is ${usd(Math.floor(c.maxPP))} a paycheck (${usd(c.lim)} a year).`:`Every ${usd(Math.ceil(c.gross*.01/12))} a month you save adds 1% of your pay.`):null,
     how:[s.plan==='yes'?'Turn on automatic yearly increases if your plan has them. Otherwise raise it 1% every January and with every raise.':'No plan at work? Max the Roth IRA first, then save more in a regular brokerage account.','Use the 12-month raise rule: keep spending flat for a year after a raise and send the difference to savings.','Pick low-cost index funds and leave them alone. Checking less often helps.','When you change jobs, roll the old account over. Never cash it out.']};}
   case 'goals':return{h:'Pick your next goal',why:'The basics are covered. Now save for what\'s next, in the order that matters to you.',
     how:['A home: save a down payment in high-yield savings or a money market fund, not stocks, if you\'ll buy within 3–5 years.','A car: save and buy used with cash, or put enough down to keep the loan short.','More investing: a taxable brokerage account at the same firm, in the same index funds.','Federal student loans: once everything above is done, extra payments are a fine choice, unless you\'re working toward Public Service Loan Forgiveness.']};
@@ -1777,6 +1799,19 @@ function mpRenderPlan(){
       ${c.mins>0?`<div class="r"><span>Debt minimums</span><span>−${usd(c.mins)}</span></div>`:''}
       <div class="r total"><span>${neg?'Gap':'Left for you'}</span><span>${neg?'−':''}${usd(Math.abs(c.left))}</span></div>
     </div></div>`);
+  // Retirement saving in dollars
+  if(s.plan==='yes'||c.rothYr>0){
+    const plan=mpPlanName(s),pp=v=>usd(Math.ceil(v));
+    const rows=[];
+    if(s.plan==='yes')rows.push(`<div class="r"><span>You, into your ${plan}<small>${pp(c.perPP)} a paycheck · ${c.pctR}% of pay</small></span><span>${usd(c.pre)}/yr</span></div>`);
+    if(c.matchNow>0)rows.push(`<div class="r"><span>Your employer's match</span><span>${usd(c.matchNow)}/yr</span></div>`);
+    if(c.rothYr>0)rows.push(`<div class="r"><span>Your Roth IRA</span><span>${usd(c.rothYr)}/yr</span></div>`);
+    rows.push(`<div class="r total"><span>Total going to retirement<small>${Math.round(c.totalRate*10)/10}% of your pay</small></span><span>${usd(c.pre+c.matchNow+c.rothYr)}/yr</span></div>`);
+    const marks=[];
+    if(c.t&&c.perPP<c.matchPP-1)marks.push(`Full match: <strong>${pp(c.matchPP)} a paycheck</strong>`);
+    if(s.plan==='yes')marks.push(`${Y} maximum: <strong>${usd(Math.floor(c.maxPP))} a paycheck</strong> (${usd(c.lim)} a year)`);
+    h.push(`<div class="mp-card"><div class="eyebrow">Your retirement saving</div><div class="mp-rows">${rows.join('')}</div>${marks.length?`<div style="font-size:12px;color:var(--text-2);margin-top:8px">${marks.join(' · ')}</div>`:''}</div>`);
+  }
   // Next step
   const prog=d.progress?`<div class="prog"><div style="width:${Math.min(100,d.progress[0]/Math.max(d.progress[1],1)*100).toFixed(0)}%"></div></div><div style="font-size:12px;color:var(--text-3);margin-bottom:10px">${usd(d.progress[0])} of ${usd(d.progress[1])}</div>`:'';
   h.push(`<div class="mp-card mp-step${d.gap?' gap':''}"><div class="eyebrow" style="color:${d.gap?'var(--red)':'var(--green)'}">Your next step · ${cur.n} of ${steps.length}</div>
