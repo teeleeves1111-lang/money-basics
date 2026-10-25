@@ -1654,7 +1654,7 @@ const mpEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 let mp=mpBlank();
 let mpView_='form';
 
-function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',cmode:'dollars',camt:'',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50,helpMode:'none',helpPct:'',helpCap:'',helpAmt:'',bldg:'any',hoodsHidden:[],stExtra:0,evNewPay:''};}
+function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',cmode:'dollars',camt:'',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50,helpMode:'none',helpPct:'',helpCap:'',helpAmt:'',bldg:'elev',hoodsHidden:[],stExtra:0,evNewPay:''};}
 function mpLoad(){try{const r=localStorage.getItem(MP_KEY);if(r){const o=JSON.parse(r);if(o.cmode===undefined&&o.pct)o.cmode='percent';mp=Object.assign(mpBlank(),o);return true;}}catch(e){}return false;}
 function mpSave(){try{localStorage.setItem(MP_KEY,JSON.stringify(mp));}catch(e){}}
 
@@ -1993,32 +1993,33 @@ function mpInit(){
 /* ══════════════════════════════════════════════════════════════
    START HERE — the simple front door
    ══════════════════════════════════════════════════════════════ */
-/* Typical Manhattan asking rents, fall 2026. Estimated from StreetEasy,
-   RentHop and Corcoran data (2024 neighborhood medians raised by
-   Manhattan's ~8–9%/yr rent growth; Upper Manhattan from 2026 listings).
-   Commute = door to door to Grand Central / 42nd & Lexington. */
+/* Rough typical rents for ELEVATOR buildings, fall 2026 — what you can
+   realistically find, not the median (medians skew toward new luxury
+   buildings). Calibrated to real listings: studios near Grand Central in
+   elevator buildings run about $3,000. Walk-ups typically ~10% less.
+   Commute = door to door. Update these when you see the market move. */
 const NYC_RENTS=[
-  {n:'Murray Hill',gc:'walk, 10 min',fd:'4/5, 20 min',studio:4000,two:7000},
-  {n:'Midtown East / Turtle Bay',gc:'walk, 5–10 min',fd:'4/5, 25 min',studio:4100,two:6600},
-  {n:'Kips Bay',gc:'walk or 6, 15 min',fd:'6 + 4/5, 25 min',studio:4300,two:6200},
-  {n:'Gramercy',gc:'6, 10–15 min',fd:'4/5, 15 min',studio:4200,two:6400},
-  {n:'Flatiron / NoMad',gc:'6 or R/W, 10–15 min',fd:'R/W, 15 min',studio:4900,two:9000},
-  {n:'Chelsea',gc:'20–25 min',fd:'1 or A/C/E, 20 min',studio:4700,two:8500},
-  {n:'Greenwich / West Village',gc:'20–25 min',fd:'1 or A/C/E, 15–20 min',studio:4600,two:8000},
-  {n:'Stuyvesant Town',gc:'L + 4/5/6, 25 min',fd:'L + 4/5, 25 min',studio:null,two:7000},
-  {n:'East Village',gc:'6, 20 min',fd:'20 min',studio:3150,two:6000},
-  {n:'Lower East Side',gc:'25 min',fd:'F or J, 15–20 min',studio:3100,two:6200},
-  {n:'Financial District',gc:'4/5, 15–20 min',fd:'walk',studio:4200,two:7600},
-  {n:'Battery Park City',gc:'25–30 min',fd:'walk, 10 min',studio:4800,two:8500},
-  {n:'Upper East Side (Lenox Hill)',gc:'Q or 4/5/6, 10–15 min',fd:'4/5, 30 min',studio:3400,two:5800},
-  {n:'Yorkville',gc:'Q or 4/5/6, 15–20 min',fd:'4/5, 35 min',studio:2950,two:4500},
-  {n:"Hell's Kitchen",gc:'7 or shuttle, 15–20 min',fd:'A/C/E, 30 min',studio:4300,two:6900},
-  {n:'Upper West Side',gc:'1/2/3 + shuttle, 20–25 min',fd:'2/3, 30 min',studio:3700,two:7000},
-  {n:'East Harlem',gc:'4/5, 15–20 min',fd:'4/5, 35 min',studio:2500,two:3300},
-  {n:'Central Harlem',gc:'20–25 min',fd:'2/3, 40 min',studio:2600,two:3700},
-  {n:'Washington Heights',gc:'30–40 min',fd:'A, 40 min',studio:2200,two:3000}
+  {n:'Murray Hill',gc:'walk, 10 min',fd:'4/5, 20 min',studio:3000,two:5200},
+  {n:'Midtown East / Turtle Bay',gc:'walk, 5–10 min',fd:'4/5, 25 min',studio:3100,two:5300},
+  {n:'Kips Bay',gc:'walk or 6, 15 min',fd:'6 + 4/5, 25 min',studio:3100,two:5000},
+  {n:'Gramercy',gc:'6, 10–15 min',fd:'4/5, 15 min',studio:3300,two:5500},
+  {n:'Flatiron / NoMad',gc:'6 or R/W, 10–15 min',fd:'R/W, 15 min',studio:3700,two:7000},
+  {n:'Chelsea',gc:'20–25 min',fd:'1 or A/C/E, 20 min',studio:3500,two:6500},
+  {n:'Greenwich / West Village',gc:'20–25 min',fd:'1 or A/C/E, 15–20 min',studio:3500,two:6200},
+  {n:'Stuyvesant Town',gc:'L + 4/5/6, 25 min',fd:'L + 4/5, 25 min',studio:null,two:5500},
+  {n:'East Village',gc:'6, 20 min',fd:'20 min',studio:3000,two:4900},
+  {n:'Lower East Side',gc:'25 min',fd:'F or J, 15–20 min',studio:2900,two:4700},
+  {n:'Financial District',gc:'4/5, 15–20 min',fd:'walk',studio:3200,two:5800},
+  {n:'Battery Park City',gc:'25–30 min',fd:'walk, 10 min',studio:3600,two:6800},
+  {n:'Upper East Side (Lenox Hill)',gc:'Q or 4/5/6, 10–15 min',fd:'4/5, 30 min',studio:2800,two:4600},
+  {n:'Yorkville',gc:'Q or 4/5/6, 15–20 min',fd:'4/5, 35 min',studio:2600,two:4000},
+  {n:"Hell's Kitchen",gc:'7 or shuttle, 15–20 min',fd:'A/C/E, 30 min',studio:3200,two:5400},
+  {n:'Upper West Side',gc:'1/2/3 + shuttle, 20–25 min',fd:'2/3, 30 min',studio:3000,two:5500},
+  {n:'East Harlem',gc:'4/5, 15–20 min',fd:'4/5, 35 min',studio:2400,two:3200},
+  {n:'Central Harlem',gc:'20–25 min',fd:'2/3, 40 min',studio:2400,two:3400},
+  {n:'Washington Heights',gc:'30–40 min',fd:'A, 40 min',studio:2100,two:2900}
 ];
-const ST_ELEV=1.15; // rough premium for elevator/doorman buildings over the all-buildings median
+const ST_WALKUP=0.90; // walk-ups typically run about 10% less
 const ST_DEFAULT_OTHER=1350;
 const EVENTS=[
   ['raise','📈 I got a raise'],['job','🔄 I\'m changing jobs'],['lease','🏙 I\'m signing a lease'],
@@ -2065,6 +2066,22 @@ function stInput(e){
   } else return;
   mpSave();mpUpdateCode&&mpUpdateCode();renderStart();
 }
+function stCheck(){
+  const out=$('st-chk-out');if(!out)return;const {s,c}=stCalc();const R=mpN(mp.chkRent);
+  if(!(R>0)||!(c.gross>0)){out.innerHTML='';return;}
+  const split=mp.chkRoom==='split',owe=split?R/2:R,help=stHelp(owe),share=owe-help;
+  const other=mpN(s.other),roomBase=c.takeMo-other-c.mins;
+  const comf=Math.max(0,Math.min(c.gross*0.30/12,roomBase-0.15*c.takeMo)),stretch=Math.max(0,roomBase);
+  const left=c.takeMo-other-c.mins-share;
+  const verdict=share<=comf?'<strong style="color:var(--green)">Fits comfortably.</strong>':share<=stretch?'<strong style="color:var(--amber)">Tight</strong> — you could pay it, but there\'d be little left to save.':'<strong style="color:var(--red)">More than your pay covers</strong> right now.';
+  const need=R*40,ok=split?null:c.gross>=need;
+  out.innerHTML=`<div class="mp-rows">
+    ${split?`<div class="r"><span>Your half</span><span>${usd(owe)}</span></div>`:''}
+    ${help>0?`<div class="r"><span>Family help</span><span>−${usd(help)}</span></div>`:''}
+    <div class="r total"><span>You pay each month</span><span>${usd(share)}</span></div>
+    <div class="r"><span>Left after rent and everyday costs</span><span>${usd(left)}</span></div></div>
+    <div style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">${verdict} ${split?`For the lease, landlords usually want your combined pay to be about ${usd(need)} a year (40× the rent).`:ok?`You also pass the landlord's 40× check on your own (${usd(need)} a year).`:`To pass the landlord's 40× check (${usd(need)} a year) you'd need a guarantor — usually a parent earning about ${usd(R*80)} — or a guarantor company.`}</div>`;
+}
 function stHide(n){mp.hoodsHidden=[...new Set([...(mp.hoodsHidden||[]),n])];mpSave();renderStart();}
 function stFit(share,comf,stretch){
   if(share<=comf)return'<span class="chip done">Fits</span>';
@@ -2084,7 +2101,7 @@ function renderStart(){
     const comf=Math.max(0,Math.min(c.gross*0.30/12,roomBase-0.15*c.takeMo)), stretch=Math.max(0,roomBase);
     const helping=mp.helpMode!=='none'&&stHelp(3000)>0;
     const maxRent=stMaxRent(comf);
-    const hidden=new Set(mp.hoodsHidden||[]),mult=mp.bldg==='elev'?ST_ELEV:1;
+    const hidden=new Set(mp.hoodsHidden||[]),mult=mp.bldg==='walkup'?ST_WALKUP:1;
     const rows=NYC_RENTS.filter(r=>!hidden.has(r.n)).map(r=>{
       const st=r.studio?Math.round(r.studio*mult/50)*50:null,two=Math.round(r.two*mult/50)*50;
       const half=two/2,sS=st?st-stHelp(st):null,sH=half-stHelp(half);
@@ -2099,11 +2116,20 @@ function renderStart(){
         <div class="metric-card"><div class="metric-label">Tight</div><div class="metric-value" style="color:var(--amber)">${usd(stretch)}/mo</div><div class="metric-sub">uses everything left; nothing saved</div></div>
       </div>
       <div style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:12px">You take home about <strong>${usd(c.takeMo)} a month</strong>${c.pre>0?' after your retirement savings':''}. After ${usd(other)} for everything else${c.mins>0?` and ${usd(c.mins)} in debt payments`:''}, that's what's left for rent.${helping?` <strong>With your family's help, a place renting for up to about ${usd(maxRent)} fits comfortably.</strong>`:''}</div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><label class="check-label" style="font-size:13px;color:var(--text-2)"><input type="checkbox" ${mp.bldg==='elev'?'checked':''} onchange="mp.bldg=this.checked?'elev':'any';mpSave();renderStart()"> Elevator or doorman buildings only</label>${hidden.size?`<a href="#" onclick="mp.hoodsHidden=[];mpSave();renderStart();return false" style="font-size:12px;color:var(--blue)">Show ${hidden.size} hidden neighborhood${hidden.size>1?'s':''}</a>`:'<span style="font-size:12px;color:var(--text-3)">Tap ✕ to hide neighborhoods you wouldn\'t consider.</span>'}</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><label class="check-label" style="font-size:13px;color:var(--text-2)"><input type="checkbox" ${mp.bldg==='walkup'?'checked':''} onchange="mp.bldg=this.checked?'walkup':'elev';mpSave();renderStart()"> Include walk-ups (usually ~10% cheaper)</label>${hidden.size?`<a href="#" onclick="mp.hoodsHidden=[];mpSave();renderStart();return false" style="font-size:12px;color:var(--blue)">Show ${hidden.size} hidden neighborhood${hidden.size>1?'s':''}</a>`:'<span style="font-size:12px;color:var(--text-3)">Tap ✕ to hide neighborhoods you wouldn\'t consider.</span>'}</div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
         <tr style="font-size:11px;color:var(--text-3)"><td style="padding:0 0 6px">Manhattan neighborhood · commute</td><td style="text-align:right;padding:0 4px 6px">Studio on your own${helping?'<br>your share':''}</td><td style="text-align:right;padding:0 0 6px 4px">Half a 2-bedroom${helping?'<br>your share':''}</td></tr>${rows}</table></div>
-      <div style="font-size:11px;color:var(--text-3);margin:8px 0 12px;line-height:1.6">Typical asking rents, fall 2026 — estimates from public listing data${mp.bldg==='elev'?', plus a rough 15% for elevator or doorman buildings':''}. Real apartments vary a lot; use these to narrow the search, then check listings. A roommate can be a friend or family member; this assumes you split rent evenly.</div>
-      <div class="insight insight-amber" style="margin-bottom:0"><strong>The rule landlords use:</strong> most NYC landlords want your yearly pay to be <strong>40 times the monthly rent</strong>. A ${usd(exStudio)} studio means ${need40(exStudio)} a year${c.gross>=exStudio*40?' — you qualify on your own.':`. You make ${usd(c.gross)}, so you'd need a <strong>guarantor</strong>: someone who co-signs the lease, usually a parent, and who typically needs to earn 80 times the rent (${usd(exStudio*80)}). Guarantor companies are another option for a fee. With a roommate, landlords usually add your incomes together.`}</div>`;
+      <div style="font-size:11px;color:var(--text-3);margin:8px 0 12px;line-height:1.6">Rough rents you can typically find in elevator buildings, fall 2026${mp.bldg==='walkup'?', minus about 10% to include walk-ups':''}. Doorman and new buildings run higher. Real listings are the best guide — check one below. A roommate can be a friend or family member; this assumes you split rent evenly.</div>
+      <div class="insight insight-amber" style="margin-bottom:0"><strong>The rule landlords use:</strong> most NYC landlords want your yearly pay to be <strong>40 times the monthly rent</strong>. A ${usd(exStudio)} studio means ${need40(exStudio)} a year${c.gross>=exStudio*40?' — you qualify on your own.':`. You make ${usd(c.gross)}, so you'd need a <strong>guarantor</strong>: someone who co-signs the lease, usually a parent, and who typically needs to earn 80 times the rent (${usd(exStudio*80)}). Guarantor companies are another option for a fee. With a roommate, landlords usually add your incomes together.`}</div>
+      <div class="mp-sec" style="margin:14px 0 0;background:var(--surface);border:none">
+        <h3 style="margin-bottom:8px">Check an apartment you found</h3>
+        <div class="mp-row" style="margin-bottom:8px">
+          <label class="mp-field">Monthly rent on the listing<span class="mp-money"><input type="number" inputmode="decimal" min="0" value="${mpEsc(mp.chkRent||'')}" oninput="mp.chkRent=this.value;mpSave();stCheck()" id="st-chk-rent" placeholder="e.g. 3000"></span></label>
+          <label class="mp-field">Living there<select onchange="mp.chkRoom=this.value;mpSave();stCheck()" id="st-chk-room"><option value="alone"${mp.chkRoom!=='split'?' selected':''}>On my own</option><option value="split"${mp.chkRoom==='split'?' selected':''}>Splitting it with a roommate</option></select></label>
+        </div>
+        <div id="st-chk-out"></div>
+      </div>`;
+    stCheck();
   }
   // 2. Headed
   if(!has){$('st-headed').innerHTML=`<div style="font-size:13px;color:var(--text-3)">Add your yearly pay above to see this.</div>`;}
