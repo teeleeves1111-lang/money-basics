@@ -215,6 +215,7 @@ select{font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-size:13px;p
 .ref-num{font-weight:600;color:var(--blue);margin-right:6px;}
 .footer-note{max-width:680px;margin:0 auto;padding:0 20px 40px;font-size:11px;color:var(--text-3);line-height:1.6;text-align:center;}
 
+.back-link{display:inline-block;font-size:13px;color:var(--blue);text-decoration:none;margin-bottom:14px;}
 /* MY PLAN */
 .mp-sec{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:16px 18px;margin-bottom:12px;}
 .mp-sec h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:12px;}
@@ -297,22 +298,103 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 </div>
 
 <div class="nav-bar">
-  <button class="nav-btn active" data-mod="paths" onclick="showMod('paths',this)">👥 Three Paths</button>
-  <button class="nav-btn" data-mod="plan" onclick="showMod('plan',this)">🧭 My Plan</button>
-  <button class="nav-btn" data-mod="compound" onclick="showMod('compound',this)">⏱ Compounding</button>
-  <button class="nav-btn" data-mod="accounts" onclick="showMod('accounts',this)">🪜 Account Ladder</button>
-  <button class="nav-btn" data-mod="paycheck" onclick="showMod('paycheck',this)">💵 Paycheck</button>
-  <button class="nav-btn" data-mod="roth" onclick="showMod('roth',this)">🔀 Roth vs Trad</button>
-  <button class="nav-btn" data-mod="coast" onclick="showMod('coast',this)">🏄 Coast FIRE</button>
-  <button class="nav-btn" data-mod="invest" onclick="showMod('invest',this)">📊 What to Buy</button>
-  <button class="nav-btn" data-mod="jobchange" onclick="showMod('jobchange',this)">🔄 Job Change</button>
+  <button class="nav-btn active" data-mod="start" onclick="go('start')">🏠 Start here</button>
+  <button class="nav-btn" data-mod="events" onclick="go('events')">⚡ Something happened</button>
+  <button class="nav-btn" data-mod="plan" onclick="go('plan')">🧭 My plan</button>
+  <button class="nav-btn" data-mod="learn" onclick="go('learn')">📚 Learn more</button>
 </div>
 
 <div class="content">
 
-<!-- ══ START HERE: THREE PATHS ══ -->
-<div class="module active" id="mod-paths">
-  <div class="eyebrow">Start here</div>
+<!-- ══ START HERE ══ -->
+<div class="module active" id="mod-start">
+  <div class="mod-title">Your money, in plain English</div>
+  <div class="mod-desc">A few numbers, then three answers: where you can afford to live, where you're headed, and the one thing worth doing next. Rough numbers are fine, and nothing leaves this browser.</div>
+
+  <div class="mp-sec" oninput="stInput(event)" onchange="stInput(event)">
+    <h3>About you</h3>
+    <div class="mp-row">
+      <label class="mp-field">Your yearly pay, before taxes<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="salary" placeholder="e.g. 68000"></span></label>
+      <label class="mp-field">Your age<input type="number" inputmode="numeric" min="16" max="80" data-mp="age" placeholder="e.g. 24"></label>
+    </div>
+    <div class="mp-row">
+      <label class="mp-field">How often you're paid<select data-mp="freq"><option value="26">Every two weeks</option><option value="24">Twice a month</option><option value="52">Every week</option><option value="12">Once a month</option></select></label>
+      <label class="mp-field">Everything you spend a month, besides rent<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="other" placeholder="1350"></span><small>Food, subway, phone, utilities, going out. Not sure? Leave blank — we'll use $1,350, typical for Manhattan.</small></label>
+    </div>
+  </div>
+
+  <!-- 1. Where can I live -->
+  <div class="mp-card">
+    <div class="eyebrow">1 · Where can I afford to live?</div>
+    <div class="mp-row" oninput="stInput(event)" onchange="stInput(event)" style="margin-top:8px">
+      <label class="mp-field">Is family helping with rent?<select data-mp="helpMode"><option value="none">No</option><option value="share">Yes — a share of the rent</option><option value="amount">Yes — a set amount each month</option></select></label>
+      <span></span>
+    </div>
+    <div class="mp-row" id="st-w-share" oninput="stInput(event)" style="display:none">
+      <label class="mp-field">They pay (% of the rent)<input type="number" inputmode="decimal" min="0" max="100" data-mp="helpPct" placeholder="50"></label>
+      <label class="mp-field">On a rent up to<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="helpCap" placeholder="no limit"></span><small>Above this, the rest is yours.</small></label>
+    </div>
+    <div class="mp-row" id="st-w-amount" oninput="stInput(event)" style="display:none">
+      <label class="mp-field">They pay, per month<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="helpAmt"></span></label>
+      <span></span>
+    </div>
+    <div id="st-afford"></div>
+  </div>
+
+  <!-- 2. Where am I headed -->
+  <div class="mp-card">
+    <div class="eyebrow">2 · Where am I headed?</div>
+    <div class="mp-row" oninput="stInput(event)" onchange="stInput(event)" style="margin-top:8px">
+      <label class="mp-field">Into your retirement account at work, each paycheck<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="camt" placeholder="0"></span><small>Your 401(k), 403(b) or SIMPLE IRA. It's on your pay stub. 0 if you haven't signed up.</small></label>
+      <label class="mp-field">Does your employer add money to it?<select data-mp="match"><option value="unsure">Not sure</option><option value="none">No</option><option value="50-6">Yes — 50¢ per $1, up to 6% of pay</option><option value="100-3">Yes — $1 per $1, up to 3% of pay</option><option value="100-4">Yes — $1 per $1, up to 4% of pay</option><option value="100-6">Yes — $1 per $1, up to 6% of pay</option></select><small>Your benefits website calls this the "match."</small></label>
+    </div>
+    <div class="mp-row" oninput="stInput(event)">
+      <label class="mp-field">Already saved for retirement<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="rbal" placeholder="0"></span></label>
+      <span></span>
+    </div>
+    <div id="st-headed"></div>
+  </div>
+
+  <!-- 3. Next step -->
+  <div class="mp-card">
+    <div class="eyebrow">3 · The one thing to do next</div>
+    <div class="mp-row" oninput="stInput(event)" style="margin-top:8px">
+      <label class="mp-field">Savings you could get to this week<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="cash" placeholder="0"></span></label>
+      <label class="mp-field">Credit card balance you carry month to month<span class="mp-money"><input type="number" inputmode="decimal" min="0" id="st-card" placeholder="0"></span><small>Not what you pay off in full each month.</small></label>
+    </div>
+    <div class="mp-row" oninput="stInput(event)">
+      <label class="mp-field">What you pay in rent now (your share)<span class="mp-money"><input type="number" inputmode="decimal" min="0" data-mp="rent" placeholder="0"></span><small>0 if you're living at home for now.</small></label>
+      <span></span>
+    </div>
+    <div id="st-next"></div>
+  </div>
+
+  <div class="mp-card">
+    <div class="eyebrow">Something happened?</div>
+    <div style="font-size:13px;color:var(--text-2);margin:4px 0 10px">Come back when life changes. Each one is a single short page.</div>
+    <div class="btn-row2" style="margin:0" id="st-events"></div>
+  </div>
+</div>
+
+<!-- ══ SOMETHING HAPPENED ══ -->
+<div class="module" id="mod-events">
+  <div class="mod-title">Something happened</div>
+  <div class="mod-desc">Pick what's going on. You'll get a short answer using your numbers from Start here.</div>
+  <div class="btn-row2" id="ev-buttons" style="margin-top:0"></div>
+  <div id="ev-body"></div>
+</div>
+
+<!-- ══ LEARN MORE ══ -->
+<div class="module" id="mod-learn">
+  <div class="mod-title">Learn more</div>
+  <div class="mod-desc">The details behind the answers, for when you're curious. None of this is required.</div>
+  <div id="learn-list"></div>
+</div>
+
+<!-- ══ THREE PATHS ══ -->
+<div class="module" id="mod-paths">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
+  <div class="eyebrow">Learn more</div>
   <div class="mod-title">Same job. Three different lives.</div>
   <div class="mod-desc">Three friends start the same job on the same day at the same salary. None of them does anything reckless. Watch where a few ordinary choices in the first couple of years take each of them.</div>
   <div class="slider-row"><span class="slider-label">Starting salary</span><input type="range" min="35000" max="200000" step="1000" value="75000" id="tp-sal" oninput="updateTP()"><span class="slider-val" id="tp-sal-v">$75,000</span></div>
@@ -331,7 +413,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
     <div class="rule-item"><span style="font-size:16px;flex-shrink:0">🚗</span><div>The first lifestyle upgrade is usually a car. A $600/month lease is $36,000 over five years with nothing to show for it. Invested instead, at 4% real, it's about $40,000.</div></div>
   </div>
 
-  <div class="insight insight-purple"><strong>Your turn:</strong> the <strong>🧭 My Plan</strong> tab takes your own numbers and tells you which step to work on this month.</div>
+  <div class="insight insight-purple"><strong>Your turn:</strong> <a href="#" onclick="go('start');return false" style="color:inherit">Start here</a> puts your own numbers in this picture.</div>
   <div class="insight insight-purple"><strong>The move from this tab:</strong> Set up savings once, on day one, so it happens before the money reaches your checking account. 401k to at least the full match through payroll. An automatic transfer to a Roth IRA the day after payday. An automatic transfer to a high-yield savings account until you have 3–6 months of expenses. Then live on what's left.</div>
   <div class="insight insight-blue"><strong>How this works:</strong> Savings rates include the employer match. Returns are 4% after inflation, all in today's dollars. Taxes use the State and Filing settings on the Paycheck tab. "Work optional" is when savings reach 25× what that person spends in a year (the 4% rule). "Coast" is when savings will reach that by 65 without adding another dollar. Social Security isn't counted; it would move everyone a few years earlier.</div>
 </div>
@@ -450,6 +532,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 1: COMPOUND ══ -->
 <div class="module" id="mod-compound">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 1</div>
   <div class="mod-title">Time is the asset</div>
   <div class="mod-desc">The most powerful force in investing isn't how much you earn — it's how early you start. See what waiting 10 years actually costs.</div>
@@ -467,6 +550,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 2: ACCOUNT LADDER ══ -->
 <div class="module" id="mod-accounts">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 2</div>
   <div class="mod-title">Where to put your money first</div>
   <div class="mod-desc">The order you fund accounts matters more than how much you invest. Tap each step to learn why.</div>
@@ -497,6 +581,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 3: PAYCHECK ══ -->
 <div class="module" id="mod-paycheck">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 3</div>
   <div class="mod-title">Pay yourself first</div>
   <div class="mod-desc">Savings happen before you see the money — not from what's left over. See how contributions affect take-home and how the tax code subsidizes your retirement accounts.</div>
@@ -594,6 +679,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 4: ROTH ══ -->
 <div class="module" id="mod-roth">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 4</div>
   <div class="mod-title">Roth or Traditional?</div>
   <div class="mod-desc">Answer a few questions about your situation and we'll tell you which account type makes more sense — and why.</div>
@@ -603,6 +689,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 5: COAST FIRE ══ -->
 <div class="module" id="mod-coast">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 5</div>
   <div class="mod-title">Coast FIRE</div>
   <div class="mod-desc">The point where your savings will grow to fund retirement on their own — no more contributions needed. Find your number.</div>
@@ -624,6 +711,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 6: WHAT TO BUY ══ -->
 <div class="module" id="mod-invest">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 6</div>
   <div class="mod-title">What to actually invest in</div>
   <div class="mod-desc">The evidence on index funds vs. stock picking — and a smarter framework for doing both.</div>
@@ -754,6 +842,7 @@ hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
 
 <!-- ══ MODULE 7: JOB CHANGE ══ -->
 <div class="module" id="mod-jobchange">
+  <a href="#" class="back-link" onclick="go('learn');return false">← Learn more</a>
   <div class="eyebrow">Module 7</div>
   <div class="mod-title">Job change fire drill</div>
   <div class="mod-desc">Changing jobs triggers five financial decisions with hard deadlines. Most people only negotiate salary — and forfeit thousands everywhere else.</div>
@@ -898,12 +987,6 @@ function initRules(){
   $('footer-note').innerHTML=`Uses ${Y} federal tax brackets and contribution limits. Estimates for learning, not individual financial or tax advice.`;
 }
 
-function showMod(id,btn){
-  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  $('mod-'+id).classList.add('active');
-  btn.classList.add('active');
-}
 
 /* ── START HERE: THREE PATHS ── */
 const PATHS=[
@@ -915,9 +998,9 @@ const PATHS=[
    bullets:['Nicer one-bedroom right away','Leases a new car in year one','Puts in less than the match needs — leaves free money behind','Each raise becomes a nicer lifestyle']}
 ];
 const TP_END_AGE=80;
-function simPath(p,S0,g,age0,stateKey,married){
+function simPath(p,S0,g,age0,stateKey,married,bal0){
   const rr=RULES.realReturn;
-  let bal=0,coastAge=null,fiAge=null;const series=[];
+  let bal=bal0||0,coastAge=null,fiAge=null;const series=[];
   let spend0=0;
   for(let age=age0;age<=TP_END_AGE;age++){
     const y=age-age0,S=S0*Math.pow(1+g,y);
@@ -1571,7 +1654,7 @@ const mpEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 let mp=mpBlank();
 let mpView_='form';
 
-function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',cmode:'dollars',camt:'',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50};}
+function mpBlank(){return{age:'',filing:'single',state:'nj',student:'no',paymode:'salary',freq:'26',salary:'',hourly:'',hours:'40',takehome:'',plan:'yes',ptype:'401k',cmode:'dollars',camt:'',pct:'',match:'unsure',mpct:'',mupto:'',roth:'',hsa:'unsure',rent:'',car:'',other:'',cash:'',rbal:'',debts:[],buckets:{},share:50,helpMode:'none',helpPct:'',helpCap:'',helpAmt:'',bldg:'any',hoodsHidden:[],stExtra:0,evNewPay:''};}
 function mpLoad(){try{const r=localStorage.getItem(MP_KEY);if(r){const o=JSON.parse(r);if(o.cmode===undefined&&o.pct)o.cmode='percent';mp=Object.assign(mpBlank(),o);return true;}}catch(e){}return false;}
 function mpSave(){try{localStorage.setItem(MP_KEY,JSON.stringify(mp));}catch(e){}}
 
@@ -1691,7 +1774,8 @@ function mpCalc(s){
   const thPP=mpN(s.takehome);
   const estimated=!(thPP>0);
   const takeMo=estimated?estTake/12:thPP*freq/12;
-  const bills=mpN(s.rent)+mpN(s.car)+mpN(s.other);
+  const otherEst=(s.other===''||s.other==null);
+  const bills=mpN(s.rent)+mpN(s.car)+(otherEst?ST_DEFAULT_OTHER:mpN(s.other));
   const debts=(s.debts||[]).filter(d=>mpN(d.balance)>0);
   const mins=debts.reduce((a,d)=>a+mpN(d.min),0);
   const left=takeMo-bills-mins;
@@ -1718,13 +1802,13 @@ function mpCalc(s){
   const saverRate=s.student==='yes'||mpN(s.age)<18?0:agi<=sv[0]?.5:agi<=sv[1]?.2:agi<=sv[2]?.1:0;
   const saverCredit=Math.round(saverRate*Math.min(pre+rothYr,2000));
   const rp=RULES.rothPhaseOut[married?'married':'single'];
-  return{freq,gross,married,isSimple,lim,pct,pctR,perPP,maxPP,maxPct,overMax,matchPP,pre,tax,taxNoSave,estTake,estimated,takeMo,bills,debts,mins,left,terms,t,matchNow,matchFull,rothYr,totalRate,expensive,monthlyNeeds,cushionTarget,efTarget,cash,share,bucketYr,bucketMo,toStep,preSaves,agi,saverRate,saverCredit,rothOver:agi>rp[0]};
+  return{otherEst,freq,gross,married,isSimple,lim,pct,pctR,perPP,maxPP,maxPct,overMax,matchPP,pre,tax,taxNoSave,estTake,estimated,takeMo,bills,debts,mins,left,terms,t,matchNow,matchFull,rothYr,totalRate,expensive,monthlyNeeds,cushionTarget,efTarget,cash,share,bucketYr,bucketMo,toStep,preSaves,agi,saverRate,saverCredit,rothOver:agi>rp[0]};
 }
 function mpSteps(s,c){
   const st={
     number:c.left>=0?'done':'now',
     cushion:c.cash>=c.cushionTarget?'done':'todo',
-    match:(s.plan==='no'||c.terms===null)?'skip':(c.terms==='unsure'||s.plan==='unsure')?'todo':(c.perPP>=c.matchPP-1?'done':'todo'),
+    match:(s.plan==='no'||c.terms===null)?'skip':(c.terms==='unsure'||s.plan==='unsure')?'todo':(c.perPP>=c.matchPP*0.97-1?'done':'todo'),
     debt:c.expensive.length?'todo':'done',
     emergency:c.efTarget>0&&c.cash>=c.efTarget?'done':'todo',
     roth:(c.rothYr>=LIM.ira*0.95||c.totalRate>=15)?'done':'todo',
@@ -1795,7 +1879,7 @@ function mpRenderPlan(){
     <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">${neg?'Must-pay bills and minimums are more than take-home pay.':'After must-pay bills and debt minimums.'}</div>
     <div class="mp-rows">
       <div class="r"><span>Take-home pay${c.estimated?' <small>estimated from your pay and '+Y+' tax rules</small>':''}</span><span>${usd(c.takeMo)}</span></div>
-      <div class="r"><span>Must-pay bills</span><span>−${usd(c.bills)}</span></div>
+      <div class="r"><span>Must-pay bills${c.otherEst?` <small>includes a ${usd(ST_DEFAULT_OTHER)} estimate for everyday costs — add yours in My numbers</small>`:''}</span><span>−${usd(c.bills)}</span></div>
       ${c.mins>0?`<div class="r"><span>Debt minimums</span><span>−${usd(c.mins)}</span></div>`:''}
       <div class="r total"><span>${neg?'Gap':'Left for you'}</span><span>${neg?'−':''}${usd(Math.abs(c.left))}</span></div>
     </div></div>`);
@@ -1808,7 +1892,7 @@ function mpRenderPlan(){
     if(c.rothYr>0)rows.push(`<div class="r"><span>Your Roth IRA</span><span>${usd(c.rothYr)}/yr</span></div>`);
     rows.push(`<div class="r total"><span>Total going to retirement<small>${Math.round(c.totalRate*10)/10}% of your pay</small></span><span>${usd(c.pre+c.matchNow+c.rothYr)}/yr</span></div>`);
     const marks=[];
-    if(c.t&&c.perPP<c.matchPP-1)marks.push(`Full match: <strong>${pp(c.matchPP)} a paycheck</strong>`);
+    if(c.t&&c.perPP<c.matchPP*0.97-1)marks.push(`Full match: <strong>${pp(c.matchPP)} a paycheck</strong>`);
     if(s.plan==='yes')marks.push(`${Y} maximum: <strong>${usd(Math.floor(c.maxPP))} a paycheck</strong> (${usd(c.lim)} a year)`);
     h.push(`<div class="mp-card"><div class="eyebrow">Your retirement saving</div><div class="mp-rows">${rows.join('')}</div>${marks.length?`<div style="font-size:12px;color:var(--text-2);margin-top:8px">${marks.join(' · ')}</div>`:''}</div>`);
   }
@@ -1899,15 +1983,256 @@ function mpUseInTabs(){
   setR('cf-saved',mpN(s.rbal));setR('cf-mo',mpRound((c.pre+c.matchNow+c.rothYr)/12,50));
   if(c.gross>0)setR('tp-sal',c.gross);
   updateCF();updateC();updateAl();updateTP();renderLadder();
-  const btn=document.querySelector('.nav-btn[data-mod="paycheck"]');if(btn)showMod('paycheck',btn);
+  go('paycheck');
 }
 function mpInit(){
   const had=mpLoad();mpFill();
   if(had&&(mpN(mp.salary)>0||mpN(mp.hourly)>0||mpN(mp.takehome)>0))mpView('plan');else mpView('form');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   START HERE — the simple front door
+   ══════════════════════════════════════════════════════════════ */
+/* Typical Manhattan asking rents, fall 2026. Estimated from StreetEasy,
+   RentHop and Corcoran data (2024 neighborhood medians raised by
+   Manhattan's ~8–9%/yr rent growth; Upper Manhattan from 2026 listings).
+   Commute = door to door to Grand Central / 42nd & Lexington. */
+const NYC_RENTS=[
+  {n:'Murray Hill',gc:'walk, 10 min',fd:'4/5, 20 min',studio:4000,two:7000},
+  {n:'Midtown East / Turtle Bay',gc:'walk, 5–10 min',fd:'4/5, 25 min',studio:4100,two:6600},
+  {n:'Kips Bay',gc:'walk or 6, 15 min',fd:'6 + 4/5, 25 min',studio:4300,two:6200},
+  {n:'Gramercy',gc:'6, 10–15 min',fd:'4/5, 15 min',studio:4200,two:6400},
+  {n:'Flatiron / NoMad',gc:'6 or R/W, 10–15 min',fd:'R/W, 15 min',studio:4900,two:9000},
+  {n:'Chelsea',gc:'20–25 min',fd:'1 or A/C/E, 20 min',studio:4700,two:8500},
+  {n:'Greenwich / West Village',gc:'20–25 min',fd:'1 or A/C/E, 15–20 min',studio:4600,two:8000},
+  {n:'Stuyvesant Town',gc:'L + 4/5/6, 25 min',fd:'L + 4/5, 25 min',studio:null,two:7000},
+  {n:'East Village',gc:'6, 20 min',fd:'20 min',studio:3150,two:6000},
+  {n:'Lower East Side',gc:'25 min',fd:'F or J, 15–20 min',studio:3100,two:6200},
+  {n:'Financial District',gc:'4/5, 15–20 min',fd:'walk',studio:4200,two:7600},
+  {n:'Battery Park City',gc:'25–30 min',fd:'walk, 10 min',studio:4800,two:8500},
+  {n:'Upper East Side (Lenox Hill)',gc:'Q or 4/5/6, 10–15 min',fd:'4/5, 30 min',studio:3400,two:5800},
+  {n:'Yorkville',gc:'Q or 4/5/6, 15–20 min',fd:'4/5, 35 min',studio:2950,two:4500},
+  {n:"Hell's Kitchen",gc:'7 or shuttle, 15–20 min',fd:'A/C/E, 30 min',studio:4300,two:6900},
+  {n:'Upper West Side',gc:'1/2/3 + shuttle, 20–25 min',fd:'2/3, 30 min',studio:3700,two:7000},
+  {n:'East Harlem',gc:'4/5, 15–20 min',fd:'4/5, 35 min',studio:2500,two:3300},
+  {n:'Central Harlem',gc:'20–25 min',fd:'2/3, 40 min',studio:2600,two:3700},
+  {n:'Washington Heights',gc:'30–40 min',fd:'A, 40 min',studio:2200,two:3000}
+];
+const ST_ELEV=1.15; // rough premium for elevator/doorman buildings over the all-buildings median
+const ST_DEFAULT_OTHER=1350;
+const EVENTS=[
+  ['raise','📈 I got a raise'],['job','🔄 I\'m changing jobs'],['lease','🏙 I\'m signing a lease'],
+  ['bonus','💵 I got a bonus or extra money'],['tax','🧾 It\'s tax time'],['benefits','🩺 Benefits sign-up time']
+];
+let evCur='raise';
+
+function stHelp(rentOwed){
+  const m=mp.helpMode;
+  if(m==='amount')return Math.min(mpN(mp.helpAmt),rentOwed);
+  if(m==='share'){const p=Math.min(Math.max(mpN(mp.helpPct),0),100)/100;const cap=mpN(mp.helpCap)>0?mpN(mp.helpCap):Infinity;return p*Math.min(rentOwed,cap);}
+  return 0;
+}
+function stMaxRent(budget){ // largest rent whose share after help fits budget
+  if(budget<=0)return 0;let lo=0,hi=30000;
+  for(let i=0;i<40;i++){const m=(lo+hi)/2;if(m-stHelp(m)<=budget)lo=m;else hi=m;}
+  return lo;
+}
+function stCalc(){
+  const s=Object.assign({},mp,{plan:mpN(mp.camt)>0||mp.match!=='unsure'?'yes':mp.plan,other:mpN(mp.other)>0?mp.other:String(ST_DEFAULT_OTHER)});
+  return{s,c:mpCalc(s)};
+}
+function stFill(){
+  document.querySelectorAll('#mod-start [data-mp]').forEach(el=>{
+    const k=el.dataset.mp;let v=mp[k]??'';
+    if(k==='camt'&&mp.cmode==='percent'){const g=mpN(mp.salary),f=mpN(mp.freq)||26;v=g>0&&mpN(mp.pct)>0?String(Math.round(g*mpN(mp.pct)/100/f)):'';}
+    if(k==='match'&&!['unsure','none','50-6','100-3','100-4','100-6'].includes(v))v='unsure';
+    if(el.tagName==='SELECT'&&v==='')return;
+    el.value=v;
+  });
+  const card=(mp.debts||[]).find(d=>d.type==='card');$('st-card').value=card?card.balance:'';
+}
+function stInput(e){
+  const el=e&&e.target;if(!el)return;
+  if(el.dataset&&el.dataset.mp){
+    const k=el.dataset.mp;mp[k]=el.value;
+    if(k==='camt'){mp.cmode='dollars';if(mpN(el.value)>0)mp.plan='yes';}
+    if(k==='match'&&el.value!=='unsure'&&el.value!=='none')mp.plan='yes';
+    if(k==='salary')mp.paymode='salary';
+  } else if(el.id==='st-card'){
+    const v=mpN(el.value);mp.debts=mp.debts||[];const i=mp.debts.findIndex(d=>d.type==='card');
+    if(v>0){if(i>=0)mp.debts[i].balance=String(v);else mp.debts.push({type:'card',balance:String(v),rate:'24',min:String(Math.max(25,Math.round(v*.03)))});}
+    else if(i>=0)mp.debts.splice(i,1);
+  } else return;
+  mpSave();mpUpdateCode&&mpUpdateCode();renderStart();
+}
+function stHide(n){mp.hoodsHidden=[...new Set([...(mp.hoodsHidden||[]),n])];mpSave();renderStart();}
+function stFit(share,comf,stretch){
+  if(share<=comf)return'<span class="chip done">Fits</span>';
+  if(share<=stretch)return'<span class="chip now">Tight</span>';
+  return'<span class="chip" style="background:var(--red-light);color:var(--red)">Over</span>';
+}
+function renderStart(){
+  $('st-w-share').style.display=mp.helpMode==='share'?'grid':'none';
+  $('st-w-amount').style.display=mp.helpMode==='amount'?'grid':'none';
+  const {s,c}=stCalc();
+  const has=c.gross>0;
+  // 1. Afford
+  if(!has){$('st-afford').innerHTML=`<div style="font-size:13px;color:var(--text-3)">Add your yearly pay above to see what fits.</div>`;}
+  else{
+    const other=mpN(s.other);
+    const roomBase=c.takeMo-other-c.mins;
+    const comf=Math.max(0,Math.min(c.gross*0.30/12,roomBase-0.15*c.takeMo)), stretch=Math.max(0,roomBase);
+    const helping=mp.helpMode!=='none'&&stHelp(3000)>0;
+    const maxRent=stMaxRent(comf);
+    const hidden=new Set(mp.hoodsHidden||[]),mult=mp.bldg==='elev'?ST_ELEV:1;
+    const rows=NYC_RENTS.filter(r=>!hidden.has(r.n)).map(r=>{
+      const st=r.studio?Math.round(r.studio*mult/50)*50:null,two=Math.round(r.two*mult/50)*50;
+      const half=two/2,sS=st?st-stHelp(st):null,sH=half-stHelp(half);
+      return`<tr><td style="padding:7px 6px 7px 0;border-bottom:1px solid var(--border)"><div style="font-weight:500">${r.n} <a href="#" title="Hide" aria-label="Hide ${r.n}" onclick="stHide(${JSON.stringify(r.n).replace(/"/g,'&quot;')});return false" style="color:var(--text-3);text-decoration:none;font-size:12px">✕</a></div><div style="font-size:11px;color:var(--text-3)">Grand Central: ${r.gc}<br>Downtown (FiDi): ${r.fd}</div></td>
+        <td style="text-align:right;padding:7px 4px;border-bottom:1px solid var(--border);white-space:nowrap">${st===null?'<span style="color:var(--text-3)">few studios</span>':`${helping?`<div style="font-size:11px;color:var(--text-3)">${usd(st)} rent</div>`:''}${usd(sS)} ${stFit(sS,comf,stretch)}`}</td>
+        <td style="text-align:right;padding:7px 0 7px 4px;border-bottom:1px solid var(--border);white-space:nowrap">${helping?`<div style="font-size:11px;color:var(--text-3)">${usd(half)} half</div>`:''}${usd(sH)} ${stFit(sH,comf,stretch)}</td></tr>`;}).join('');
+    const need40=v=>usd(v*40);
+    const exStudio=Math.round(Math.min(Math.max(maxRent,2000),4500)/50)*50;
+    $('st-afford').innerHTML=`
+      <div class="metric-grid" style="margin-top:4px">
+        <div class="metric-card"><div class="metric-label">Your share of rent — comfortable</div><div class="metric-value" style="color:var(--green)">${usd(comf)}/mo</div><div class="metric-sub">about 30% of your pay — room left to save</div></div>
+        <div class="metric-card"><div class="metric-label">Tight</div><div class="metric-value" style="color:var(--amber)">${usd(stretch)}/mo</div><div class="metric-sub">uses everything left; nothing saved</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:12px">You take home about <strong>${usd(c.takeMo)} a month</strong>${c.pre>0?' after your retirement savings':''}. After ${usd(other)} for everything else${c.mins>0?` and ${usd(c.mins)} in debt payments`:''}, that's what's left for rent.${helping?` <strong>With your family's help, a place renting for up to about ${usd(maxRent)} fits comfortably.</strong>`:''}</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><label class="check-label" style="font-size:13px;color:var(--text-2)"><input type="checkbox" ${mp.bldg==='elev'?'checked':''} onchange="mp.bldg=this.checked?'elev':'any';mpSave();renderStart()"> Elevator or doorman buildings only</label>${hidden.size?`<a href="#" onclick="mp.hoodsHidden=[];mpSave();renderStart();return false" style="font-size:12px;color:var(--blue)">Show ${hidden.size} hidden neighborhood${hidden.size>1?'s':''}</a>`:'<span style="font-size:12px;color:var(--text-3)">Tap ✕ to hide neighborhoods you wouldn\'t consider.</span>'}</div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr style="font-size:11px;color:var(--text-3)"><td style="padding:0 0 6px">Manhattan neighborhood · commute</td><td style="text-align:right;padding:0 4px 6px">Studio on your own${helping?'<br>your share':''}</td><td style="text-align:right;padding:0 0 6px 4px">Half a 2-bedroom${helping?'<br>your share':''}</td></tr>${rows}</table></div>
+      <div style="font-size:11px;color:var(--text-3);margin:8px 0 12px;line-height:1.6">Typical asking rents, fall 2026 — estimates from public listing data${mp.bldg==='elev'?', plus a rough 15% for elevator or doorman buildings':''}. Real apartments vary a lot; use these to narrow the search, then check listings. A roommate can be a friend or family member; this assumes you split rent evenly.</div>
+      <div class="insight insight-amber" style="margin-bottom:0"><strong>The rule landlords use:</strong> most NYC landlords want your yearly pay to be <strong>40 times the monthly rent</strong>. A ${usd(exStudio)} studio means ${need40(exStudio)} a year${c.gross>=exStudio*40?' — you qualify on your own.':`. You make ${usd(c.gross)}, so you'd need a <strong>guarantor</strong>: someone who co-signs the lease, usually a parent, and who typically needs to earn 80 times the rent (${usd(exStudio*80)}). Guarantor companies are another option for a fee. With a roommate, landlords usually add your incomes together.`}</div>`;
+  }
+  // 2. Headed
+  if(!has){$('st-headed').innerHTML=`<div style="font-size:13px;color:var(--text-3)">Add your yearly pay above to see this.</div>`;}
+  else{
+    const age=mpN(s.age)||23, extra=mpN(mp.stExtra)||0;
+    const base=(c.pre+c.matchNow+c.rothYr)/c.gross;
+    const extraYr=Math.min(extra*c.freq,Math.max(c.lim-c.pre,0)+LIM.ira);
+    const more=base+extraYr/c.gross;
+    const G=0.015,R0=mpN(s.rbal);
+    const A=simPath({kind:'flat',r:base},c.gross,G,age,s.state,c.married,R0);
+    const B=simPath({kind:'flat',r:more},c.gross,G,age,s.state,c.married,R0);
+    const F=simPath({kind:'flat',r:Math.max(.15,base)},c.gross,G,age,s.state,c.married,R0);
+    const balAt=(R,a)=>{const x=R.series.find(z=>z.age===a);return x?x.bal:0;};
+    const tgt=age<30?30:age<40?40:50;
+    const a65=balAt(A,65),b65=balAt(B,65),f65=balAt(F,65);
+    const pays=v=>usd(Math.round(v*0.04/1000)*1000);
+    $('st-headed').innerHTML=`
+      <div style="font-size:13px;color:var(--text-2);margin:4px 0 10px">Right now about <strong>${usd((c.pre+c.matchNow+c.rothYr)/12)} a month</strong> goes to retirement${c.matchNow>0?`, including ${usd(c.matchNow/12)} your employer adds`:''}. If you keep saving the same share of your pay:</div>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">By ${tgt}</div><div class="metric-value">${fmt(balAt(A,tgt))}</div></div>
+        <div class="metric-card"><div class="metric-label">At 65</div><div class="metric-value">${fmt(a65)}</div><div class="metric-sub">pays about ${pays(a65)} a year for life</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:14px;line-height:1.7">That's on top of Social Security.${base<0.15?` Saving <strong>15% of your pay</strong> — about ${usd(Math.ceil(c.gross*.15/c.freq))} a paycheck, counting what your employer adds — would get you to <strong>${fmt(f65)}</strong>, about ${pays(f65)} a year.`:' You\'re saving 15% or more — that\'s a strong pace.'}</div>
+      <div class="slider-row" style="margin-bottom:6px"><span class="slider-label">What if I added</span><input type="range" min="0" max="500" step="25" value="${extra}" oninput="mp.stExtra=+this.value;mpSave();renderStart()"><span class="slider-val">${usd(extra)}/paycheck</span></div>
+      ${extra>0?`<div class="insight" style="margin-bottom:8px">Adding <strong>${usd(extra)} a paycheck</strong> — about ${usd(extra*c.freq/12*(1-c.preSaves))} a month after the tax you save — gets you <strong>${fmt(b65)}</strong> at 65 instead of ${fmt(a65)}. That's about <strong>${pays(b65-a65)} more a year</strong> in retirement.</div>`:`<div style="font-size:12px;color:var(--text-3);margin-bottom:8px">Slide to see what a little more each paycheck does.</div>`}
+      <div style="font-size:11px;color:var(--text-3);line-height:1.6">In today's dollars. Assumes a typical 4% yearly return after inflation, raises a little above inflation, and the same share of pay saved. "Pays a year" uses the 4% rule: take out 4% the first year, then the same amount adjusted for prices. <a href="#" onclick="go('paths');return false" style="color:var(--blue)">See how small choices add up →</a></div>`;
+  }
+  // 3. Next step
+  if(!has){$('st-next').innerHTML=`<div style="font-size:13px;color:var(--text-3)">Add your yearly pay above to see this.</div>`;}
+  else{
+    const steps=mpSteps(s,c),cur=steps.find(x=>x.status==='now')||steps[steps.length-1];
+    const d=mpStepDetail(cur.id,s,c);
+    $('st-next').innerHTML=`<div class="mp-step mp-card${d.gap?' gap':''}" style="margin:8px 0 10px">
+      <h2 style="font-size:21px">${d.h}</h2><p>${d.why}</p>${d.money?`<div class="money-line">${d.money}</div>`:''}
+      <ul>${d.how.slice(0,2).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <a href="#" onclick="go('plan');return false" style="color:var(--blue);font-size:13px">See all your steps and a payday plan →</a>`;
+  }
+  $('st-events').innerHTML=EVENTS.map(([k,l])=>`<button class="btn" onclick="evCur='${k}';go('events')">${l}</button>`).join('');
+}
+
+/* ── SOMETHING HAPPENED ── */
+function renderEvents(){
+  $('ev-buttons').innerHTML=EVENTS.map(([k,l])=>`<button class="btn${k===evCur?' btn-primary':''}" onclick="evCur='${k}';renderEvents()">${l}</button>`).join('');
+  const {s,c}=stCalc();const has=c.gross>0;
+  const plan=mpPlanName(s),steps=has?mpSteps(s,c):[],cur=steps.find(x=>x.status==='now');
+  const nextTxt=cur?MP_STEP_TITLES[cur.id].toLowerCase():'your next step';
+  const B=(t,items,foot)=>`<div class="mp-card"><h2 style="font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:10px">${t}</h2><ul style="margin-left:18px;font-size:13px;line-height:1.75;color:var(--text-2)">${items.map(x=>`<li style="margin-bottom:6px">${x}</li>`).join('')}</ul>${foot||''}</div>`;
+  let h='';
+  if(evCur==='raise'){
+    const nw=mpN(mp.evNewPay);
+    let calc='';
+    if(has&&nw>c.gross){
+      const r=nw-c.gross,ppRaise=r/c.freq;
+      const tax=(fedTax(nw-c.pre,c.married)-fedTax(c.gross-c.pre,c.married))+(stateTax(nw,s.state,c.married)-stateTax(c.gross,s.state,c.married))+(ficaCalc(nw)-ficaCalc(c.gross));
+      const takePP=(r-tax)/c.freq,half=Math.round(ppRaise/2/5)*5;
+      calc=`<div class="insight">Your raise is <strong>${usd(r)} a year</strong> — about <strong>${usd(takePP)} more per paycheck</strong> after taxes. Put <strong>${usd(half)} more a paycheck</strong> into your ${plan} (half the raise, before tax) and you'll still take home more than before, while your savings grow much faster.</div>`;
+    }
+    h=`<div class="mp-card"><label class="mp-field" style="max-width:280px">Your new yearly pay<span class="mp-money"><input type="number" inputmode="decimal" min="0" value="${mpEsc(mp.evNewPay||'')}" oninput="mp.evNewPay=this.value;mpSave();renderEvents();this.focus()" id="ev-newpay"></span></label>${has?'':'<div style="font-size:12px;color:var(--text-3);margin-top:6px">Add your current pay on Start here first.</div>'}</div>${calc}`+
+      B('Congratulations — here\'s how to keep it',[`<b>Save half the raise, before you get used to it.</b> Raise your ${plan} by half the raise the same week it starts. Spending you never start, you never miss.`,'<b>Keep the rest.</b> The other half is yours to enjoy. That\'s the point.','<b>Hold your rent and car the same for a year.</b> After 12 months the higher savings feel normal.','<b>Update Start here</b> with your new pay so your plan and rent numbers stay right.']);
+  }
+  if(evCur==='job')h=B('Changing jobs: the five things that matter',[
+    `<b>Don't cash out your old ${plan}.</b> You'd lose taxes plus a 10% penalty — often a third of it. Move it ("roll it over") to your new job's plan or an IRA instead.`,
+    '<b>Check when your employer\'s money becomes yours.</b> Money your employer added may have a waiting period (called "vesting"). If you\'re a few weeks from the date, it can be worth timing your last day — or asking the new job to cover it in a sign-on bonus.',
+    '<b>Sign up for the new retirement plan on day one</b>, at least enough to get all the money they add.',
+    '<b>Don\'t go without health insurance.</b> If there\'s a gap, you have 60 days to pick COBRA or a plan at healthcare.gov.',
+    '<b>Use up any FSA money</b> before your last day — it doesn\'t come with you. HSA money does.'],
+    `<a href="#" onclick="go('jobchange');return false" style="color:var(--blue);font-size:13px">Step-by-step help with the old ${plan} →</a>`);
+  if(evCur==='lease')h=B('Signing a lease in New York',[
+    '<b>The 40× rule:</b> landlords usually want yearly pay of 40 times the monthly rent. If you\'re short, a guarantor (usually a parent earning 80× the rent) co-signs.',
+    '<b>Broker fees:</b> since June 2025, NYC law says whoever hired the broker pays. If the landlord listed it with a broker, you shouldn\'t be charged that fee.',
+    '<b>Security deposit:</b> New York caps it at one month\'s rent, and it must come back within 14 days of moving out, minus documented damage. Take photos when you move in.',
+    '<b>Application fee:</b> capped at $20 in New York, for the background and credit check.',
+    '<b>Get renter\'s insurance</b> — about $10–20 a month for your stuff and liability.',
+    `<b>Check the fit:</b> ${has?`your comfortable share of rent is about <strong>${usd(Math.max(0,Math.min(c.gross*0.3/12,c.takeMo-mpN(s.other)-c.mins-0.15*c.takeMo)))} a month</strong>. `:''}See Start here for neighborhoods.`]);
+  if(evCur==='bonus'){
+    const order=[['debt','Pay off credit cards and other high-interest debt'],['cushion','A starter cushion in savings'],['emergency','Three months of bills in savings'],['roth','A Roth IRA (up to '+usd(LIM.ira)+' a year)'],['retire','More into your '+plan],['goals','A goal: a home, a trip, a car, investing']];
+    h=B('Got extra money? Here\'s the order',order.map(([id,t],i)=>`${i+1}. ${t}${cur&&cur.id===id?' <strong style="color:var(--green)">← you are here</strong>':''}`),
+      `<div style="font-size:13px;color:var(--text-2);margin-top:8px">${cur?`Based on your numbers, put it toward <strong>${nextTxt}</strong> first.`:''} A good rule: put most of a windfall to work and keep a slice — say 10–20% — to enjoy.</div>`);
+  }
+  if(evCur==='tax')h=B('Tax time',[
+    '<b>File for free.</b> IRS Free File or an IRS VITA volunteer, if your income qualifies. Skip paid "refund advances."',
+    `<b>Roth IRA deadline:</b> you can still add money for last year until April 15 (up to ${usd(LIM.ira)}).`,
+    '<b>Student loan interest:</b> up to $2,500 a year is deductible. Look for Form 1098-E from your loan servicer.',
+    `<b>Saver's Credit:</b> if your income is modest and you're not a full-time student, saving for retirement can cut your tax bill. It's Form 8880.`,
+    '<b>Big refund, or owed a lot?</b> Update your W-4 with HR so your paychecks are closer to right.']);
+  if(evCur==='benefits')h=B('Benefits sign-up: what to pick',[
+    `<b>Retirement plan:</b> put in at least enough to get all the money your employer adds.${has&&c.t?` For you that's <strong>${usd(Math.ceil(c.matchPP))} a paycheck</strong>.`:''}`,
+    '<b>Health plan:</b> healthy and rarely see a doctor? A high-deductible plan with an HSA is often cheapest — and the HSA is tax-free in and out. Otherwise, pick the plan your doctors take.',
+    '<b>Disability insurance:</b> if it\'s offered, take it. It replaces your paycheck if you can\'t work.',
+    '<b>Commuter benefit:</b> pay for your subway or train pass with pre-tax money — about a 25–35% discount.',
+    '<b>Life insurance:</b> the free amount through work is plenty if no one depends on your income.',
+    '<b>Name a beneficiary</b> on your retirement account. Two minutes.']);
+  $('ev-body').innerHTML=h;
+}
+
+/* ── LEARN MORE ── */
+const LEARN=[
+  ['paths','👥','Three paths','Three friends, same job, very different results — from a few early choices.'],
+  ['plan','🧭','My full plan','All your steps in order, plus a payday plan.'],
+  ['paycheck','💵','Where a paycheck goes','Taxes, retirement savings and take-home — line by line.'],
+  ['accounts','🪜','Which account first','The order to save in: employer money, savings, Roth IRA, and more.'],
+  ['compound','⏱','Starting early','What waiting ten years to start saving really costs.'],
+  ['invest','📊','What to invest in','Index funds, and why picking stocks usually loses.'],
+  ['roth','🔀','Roth or regular?','Short answer while you\'re starting out: Roth. Here\'s why.'],
+  ['coast','🏄','The coast point','When your savings can grow to enough on their own.'],
+  ['jobchange','🔄','Changing jobs','Your old 401(k), when employer money becomes yours, and health insurance.']
+];
+function renderLearn(){
+  $('learn-list').innerHTML=LEARN.map(([id,ic,t,d])=>`<a href="#" onclick="go('${id}');return false" class="mp-card" style="display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;margin-bottom:10px"><span style="font-size:24px">${ic}</span><span style="flex:1"><span style="display:block;font-weight:600;font-size:15px;color:var(--text)">${t}</span><span style="font-size:13px;color:var(--text-2)">${d}</span></span><span style="color:var(--text-3);font-size:18px">›</span></a>`).join('');
+}
+
+/* ── NAVIGATION ── */
+const TOP_TABS=['start','events','plan','learn'];
+function go(id){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  $('mod-'+id).classList.add('active');
+  const top=TOP_TABS.includes(id)?id:'learn';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.mod===top));
+  if(id==='start'){stFill();renderStart();}
+  if(id==='events')renderEvents();
+  if(id==='learn')renderLearn();
+  if(id==='plan'){mpFill();mpView(mpN(mp.salary)>0||mpN(mp.hourly)>0||mpN(mp.takehome)>0?'plan':'form');}
+  if(id==='paths')updateTP();
+  window.scrollTo&&window.scrollTo(0,0);
+}
+function showMod(id){go(id);}
+
 /* ── INIT ── */
-initRules();updateC();updatePlan();renderLadder();renderRoth();updateCF();updateNT();updateAl();renderJC();renderJCLadder();updateVest();updateCobra();updateTP();mpInit();
+initRules();updateC();updatePlan();renderLadder();renderRoth();updateCF();updateNT();updateAl();renderJC();renderJCLadder();updateVest();updateCobra();updateTP();mpInit();go('start');
 </script>
 </body>
 </html>
